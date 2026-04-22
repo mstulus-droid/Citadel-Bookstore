@@ -415,6 +415,47 @@
       gap: 7px;
     }
 
+    /* ========== SEARCH BAR ========== */
+    .search-row {
+      margin-top: 10px;
+      /* leave room for floating cart button (46px wide + 16px right margin + 8px gap) */
+      padding-right: 70px;
+    }
+    .search-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+    .search-icon {
+      position: absolute;
+      left: 10px;
+      color: var(--silver-dim);
+      pointer-events: none;
+      flex-shrink: 0;
+    }
+    .search-input {
+      width: 100%;
+      background: rgba(22,22,28,0.9);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text-main);
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      padding: 8px 30px 8px 34px;
+      outline: none;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .search-input:focus { border-color: var(--gold-dim); background: rgba(22,22,28,1); }
+    .search-input::placeholder { color: var(--silver-dim); }
+    .search-clear {
+      position: absolute; right: 8px;
+      background: none; border: none;
+      color: var(--silver-dim); font-size: 17px;
+      cursor: pointer; padding: 3px 5px; line-height: 1;
+      transition: color 0.15s;
+    }
+    .search-clear:hover { color: var(--text-main); }
+
     .filter-chip {
       border: 1px solid var(--border);
       background: var(--bg-card);
@@ -1105,6 +1146,8 @@
         padding-bottom: 4px;
       }
       .filter-chips::-webkit-scrollbar { display: none; }
+      /* on mobile cart is at top:72px right:14px — give same right clearance */
+      .search-row { padding-right: 68px; }
     }
 
     @media (max-width: 400px) {
@@ -1192,6 +1235,13 @@
     <span class="filter-count">Menampilkan <span id="filterCountNum">96</span> ebook</span>
   </div>
   <div class="filter-chips" id="filterChips"></div>
+  <div class="search-row">
+    <div class="search-wrap">
+      <svg class="search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" id="searchInput" class="search-input" placeholder="Cari judul atau pengarang…" oninput="onSearch(this.value)" autocomplete="off" spellcheck="false">
+      <button class="search-clear" id="searchClear" onclick="clearSearch()" style="display:none" aria-label="Hapus pencarian">×</button>
+    </div>
+  </div>
 </section>
 
 <!-- PRODUCTS -->
@@ -1463,9 +1513,28 @@
     renderProducts();
   }
 
+  let searchQuery = '';
+
+  function onSearch(val) {
+    searchQuery = val;
+    document.getElementById('searchClear').style.display = val ? 'block' : 'none';
+    renderProducts();
+  }
+
+  function clearSearch() {
+    searchQuery = '';
+    document.getElementById('searchInput').value = '';
+    document.getElementById('searchClear').style.display = 'none';
+    renderProducts();
+  }
+
   function getFilteredBooks() {
-    if (activeFilters.size === 0) return BOOKS;
-    return BOOKS.filter(b => b.genres.some(g => activeFilters.has(g)));
+    const q = searchQuery.trim().toLowerCase();
+    return BOOKS.filter(b => {
+      const matchCat = activeFilters.size === 0 || b.genres.some(g => activeFilters.has(g));
+      const matchSearch = !q || b.title.toLowerCase().includes(q) || b.author.toLowerCase().includes(q);
+      return matchCat && matchSearch;
+    });
   }
 
   // ==================== RENDER PRODUCTS ====================
