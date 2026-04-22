@@ -831,9 +831,144 @@
     }
 
     /* ========== FOOTER ========== */
+    /* ========== TANYA KETERSEDIAAN ========== */
+    .inquire-section {
+      padding: clamp(40px,6vw,64px) clamp(16px,4vw,48px);
+      background: var(--bg-secondary);
+      border-top: 1px solid var(--border);
+      text-align: center;
+    }
+    .inquire-icon {
+      font-size: 32px;
+      margin-bottom: 12px;
+    }
+    .inquire-title {
+      font-family: 'Cinzel', serif;
+      font-size: clamp(15px,2vw,20px);
+      font-weight: 600;
+      color: var(--gold);
+      margin-bottom: 8px;
+    }
+    .inquire-sub {
+      font-size: 13px;
+      color: var(--text-sub);
+      margin-bottom: 24px;
+      max-width: 420px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .inquire-open-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: transparent;
+      border: 1px solid var(--border-strong);
+      color: var(--gold);
+      font-family: 'Cinzel', serif;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      padding: 11px 26px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .inquire-open-btn:hover { background: var(--gold-glow); border-color: var(--gold); }
+
+    /* Inquire popup */
+    .inquire-overlay {
+      position: fixed; inset: 0; z-index: 500;
+      background: rgba(0,0,0,0.72);
+      display: flex; align-items: center; justify-content: center;
+      padding: 20px 16px;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.2s;
+    }
+    .inquire-overlay.open { opacity: 1; pointer-events: all; }
+    .inquire-modal {
+      background: var(--bg-card);
+      border: 1px solid var(--border-strong);
+      border-radius: 18px;
+      width: 100%; max-width: 420px;
+      padding: 28px 24px 24px;
+      box-shadow: var(--shadow);
+      transform: scale(0.9) translateY(10px);
+      opacity: 0;
+      transition: transform 0.25s cubic-bezier(0.34,1.4,0.64,1), opacity 0.2s;
+    }
+    .inquire-overlay.open .inquire-modal { transform: scale(1) translateY(0); opacity: 1; }
+    .inquire-modal-title {
+      font-family: 'Cinzel', serif;
+      font-size: 15px; font-weight: 700;
+      color: var(--gold);
+      margin-bottom: 4px;
+    }
+    .inquire-modal-sub {
+      font-size: 12px; color: var(--text-sub);
+      margin-bottom: 20px;
+    }
+    .inquire-book-list { display: flex; flex-direction: column; gap: 12px; margin-bottom: 16px; }
+    .inquire-book-row {
+      display: flex; gap: 8px; align-items: flex-start;
+    }
+    .inquire-book-fields { flex: 1; display: flex; flex-direction: column; gap: 6px; }
+    .inquire-input {
+      width: 100%;
+      background: var(--bg-primary);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text-main);
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      padding: 9px 12px;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    .inquire-input:focus { border-color: var(--gold-dim); }
+    .inquire-input::placeholder { color: var(--silver-dim); }
+    .inquire-remove-btn {
+      background: none; border: none;
+      color: var(--silver-dim); font-size: 18px;
+      cursor: pointer; padding: 6px 4px; line-height: 1;
+      transition: color 0.15s;
+      flex-shrink: 0; margin-top: 2px;
+    }
+    .inquire-remove-btn:hover { color: #c0534a; }
+    .inquire-add-btn {
+      background: none; border: 1px dashed var(--border);
+      color: var(--text-sub); font-size: 12px;
+      cursor: pointer; padding: 8px 14px;
+      border-radius: var(--radius-sm);
+      width: 100%; transition: border-color 0.15s, color 0.15s;
+      font-family: 'Inter', sans-serif;
+      margin-bottom: 16px;
+    }
+    .inquire-add-btn:hover { border-color: var(--gold-dim); color: var(--gold); }
+    .inquire-actions { display: flex; gap: 10px; }
+    .inquire-cancel-btn {
+      flex: 1; background: none;
+      border: 1px solid var(--border);
+      color: var(--text-sub); font-size: 13px;
+      padding: 10px; border-radius: var(--radius-sm);
+      cursor: pointer; transition: border-color 0.15s;
+      font-family: 'Inter', sans-serif;
+    }
+    .inquire-cancel-btn:hover { border-color: var(--silver-dim); }
+    .inquire-send-btn {
+      flex: 2;
+      background: linear-gradient(135deg, #25D366, #128C7E);
+      border: none; color: #fff;
+      font-family: 'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      font-size: 14px; font-weight: 600;
+      padding: 10px 18px; border-radius: var(--radius-sm);
+      cursor: pointer; transition: filter 0.15s;
+      display: flex; align-items: center; justify-content: center; gap: 7px;
+    }
+    .inquire-send-btn:hover { filter: brightness(1.08); }
+
     .footer {
       text-align: center;
-      padding: clamp(32px, 5vw, 48px) clamp(16px, 4vw, 48px);
+      padding: clamp(20px, 3vw, 28px) clamp(16px, 4vw, 48px);
       border-top: 1px solid var(--border);
       background: var(--bg-secondary);
     }
@@ -1063,6 +1198,34 @@
 <section class="products-section" id="koleksi">
   <div class="product-grid" id="productGrid"></div>
 </section>
+
+<!-- TANYA KETERSEDIAAN -->
+<section class="inquire-section">
+  <div class="inquire-icon">📚</div>
+  <p class="inquire-title">Tidak menemukan buku yang dicari?</p>
+  <p class="inquire-sub">Tanyakan ketersediaan buku lainnya — kami akan cek dan kabari kamu.</p>
+  <button class="inquire-open-btn" onclick="openInquire()">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+    Tanya Ketersediaan
+  </button>
+</section>
+
+<!-- INQUIRE POPUP -->
+<div class="inquire-overlay" id="inquireOverlay" onclick="onInquireOverlayClick(event)">
+  <div class="inquire-modal" id="inquireModal">
+    <p class="inquire-modal-title">Tanya Ketersediaan Buku</p>
+    <p class="inquire-modal-sub">Isi judul dan pengarang buku yang ingin kamu tanyakan.</p>
+    <div class="inquire-book-list" id="inquireList"></div>
+    <button class="inquire-add-btn" onclick="inquireAddRow()">+ Tambah buku lainnya</button>
+    <div class="inquire-actions">
+      <button class="inquire-cancel-btn" onclick="closeInquire()">Batal</button>
+      <button class="inquire-send-btn" onclick="sendInquire()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
+        Tanyakan via WhatsApp
+      </button>
+    </div>
+  </div>
+</div>
 
 <!-- FOOTER -->
 <footer class="footer">
@@ -1323,7 +1486,6 @@
       <div class="product-card" id="card-${book.id}">
         <div class="product-cover-wrap" onclick="onCoverClick(${book.id})" style="cursor:pointer">
           <img src="${safeCover}" alt="${escAttr(book.title)}" loading="lazy">
-          <span class="product-badge">${book.genres[0]}</span>
           <span class="product-in-cart" id="inCart-${book.id}">✓ Di Keranjang</span>
         </div>
         <div class="product-body">
@@ -1639,6 +1801,75 @@ Mohon konfirmasi pesanan saya. Terima kasih! 🙏`;
   renderFilters();
   renderProducts();
   updateUI();
+
+  // ==================== INQUIRE POPUP ====================
+  let inquireRows = 0;
+
+  function openInquire() {
+    inquireRows = 0;
+    document.getElementById('inquireList').innerHTML = '';
+    inquireAddRow();
+    const overlay = document.getElementById('inquireOverlay');
+    overlay.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeInquire() {
+    document.getElementById('inquireOverlay').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  function onInquireOverlayClick(e) {
+    if (e.target === document.getElementById('inquireOverlay')) closeInquire();
+  }
+
+  function inquireAddRow() {
+    inquireRows++;
+    const id = inquireRows;
+    const list = document.getElementById('inquireList');
+    const row = document.createElement('div');
+    row.className = 'inquire-book-row';
+    row.id = `inquireRow-${id}`;
+    row.innerHTML = `
+      <div class="inquire-book-fields">
+        <input class="inquire-input" id="inquireTitle-${id}" placeholder="Judul buku" type="text">
+        <input class="inquire-input" id="inquireAuthor-${id}" placeholder="Pengarang (opsional)" type="text">
+      </div>
+      ${id > 1 ? `<button class="inquire-remove-btn" onclick="inquireRemoveRow(${id})" title="Hapus">×</button>` : ''}
+    `;
+    list.appendChild(row);
+    row.querySelector('input').focus();
+  }
+
+  function inquireRemoveRow(id) {
+    const row = document.getElementById(`inquireRow-${id}`);
+    if (row) row.remove();
+  }
+
+  function sendInquire() {
+    const list = document.getElementById('inquireList');
+    const rows = list.querySelectorAll('.inquire-book-row');
+    const books = [];
+    rows.forEach(row => {
+      const id = row.id.replace('inquireRow-', '');
+      const title = (document.getElementById(`inquireTitle-${id}`)?.value || '').trim();
+      const author = (document.getElementById(`inquireAuthor-${id}`)?.value || '').trim();
+      if (title) books.push({ title, author });
+    });
+    if (books.length === 0) {
+      alert('Masukkan minimal satu judul buku.');
+      return;
+    }
+    const plural = books.length > 1;
+    let msg = `Halo Citadel Bookstore! Saya ingin menanyakan ketersediaan ${plural ? 'buku-buku' : 'buku'} berikut:\n\n`;
+    books.forEach((b, i) => {
+      msg += `${i + 1}. "${b.title}"${b.author ? ` — ${b.author}` : ''}\n`;
+    });
+    msg += `\nApakah ${plural ? 'buku-buku' : 'buku'} tersebut tersedia? Terima kasih 🙏`;
+    const wa = `https://wa.me/6285727466415?text=${encodeURIComponent(msg)}`;
+    window.open(wa, '_blank');
+    closeInquire();
+  }
 
   // Handle mobile bar visibility on resize
   window.addEventListener('resize', () => {
