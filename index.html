@@ -1754,10 +1754,33 @@
     const overlay = document.getElementById('cartOverlay');
     const sidebar = document.getElementById('cartSidebar');
     const isOpen = sidebar.classList.contains('open');
-    overlay.classList.toggle('open', !isOpen);
-    sidebar.classList.toggle('open', !isOpen);
-    document.body.style.overflow = isOpen ? '' : 'hidden';
+    if (!isOpen) {
+      // Push a history entry so back button can close the cart
+      history.pushState({ cart: true }, '');
+    } else {
+      // If closing manually (not via back button), remove the pushed state
+      if (history.state && history.state.cart) history.back();
+      return;
+    }
+    overlay.classList.add('open');
+    sidebar.classList.add('open');
+    document.body.style.overflow = 'hidden';
   }
+
+  function closeCart() {
+    const overlay = document.getElementById('cartOverlay');
+    const sidebar = document.getElementById('cartSidebar');
+    overlay.classList.remove('open');
+    sidebar.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  window.addEventListener('popstate', (e) => {
+    const sidebar = document.getElementById('cartSidebar');
+    if (sidebar.classList.contains('open')) {
+      closeCart();
+    }
+  });
 
   // ==================== CHECKOUT ====================
   function checkout() {
