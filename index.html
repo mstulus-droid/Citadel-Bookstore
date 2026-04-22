@@ -1,0 +1,1574 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Citadel Bookstore — Teman Baca Anda</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Cinzel+Decorative:wght@400;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg-primary: #0c0c0f;
+      --bg-secondary: #111115;
+      --bg-card: #16161c;
+      --bg-card-hover: #1c1c24;
+      --bg-overlay: rgba(12, 12, 15, 0.95);
+      --gold: #c9a84c;
+      --gold-light: #e8c96a;
+      --gold-dim: #9a7a2e;
+      --gold-glow: rgba(201, 168, 76, 0.18);
+      --silver: #c8c8c8;
+      --silver-dim: #888890;
+      --text-main: #e8e8e0;
+      --text-sub: #9a9a94;
+      --border: rgba(201, 168, 76, 0.18);
+      --border-strong: rgba(201, 168, 76, 0.45);
+      --red: #922b3e;
+      --green: #2e7d5e;
+      --radius: 10px;
+      --radius-sm: 6px;
+      --shadow: 0 8px 32px rgba(0,0,0,0.6);
+      --shadow-card: 0 4px 20px rgba(0,0,0,0.5);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-main);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ========== SCROLLBAR ========== */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg-secondary); }
+    ::-webkit-scrollbar-thumb { background: var(--gold-dim); border-radius: 3px; }
+
+    /* ========== NAVBAR ========== */
+    .navbar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(12, 12, 15, 0.92);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 clamp(16px, 4vw, 48px);
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .navbar-logo img {
+      height: 40px;
+      object-fit: contain;
+      display: block;
+    }
+
+    .navbar-right { display: flex; align-items: center; gap: 12px; }
+
+    .cart-btn {
+      position: relative;
+      background: transparent;
+      border: 1px solid var(--border-strong);
+      color: var(--gold);
+      cursor: pointer;
+      width: 44px;
+      height: 44px;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .cart-btn:hover { background: var(--gold-glow); border-color: var(--gold); }
+
+    .cart-badge {
+      position: absolute;
+      top: -6px; right: -6px;
+      background: var(--gold);
+      color: #000;
+      font-size: 10px;
+      font-weight: 700;
+      min-width: 18px;
+      height: 18px;
+      border-radius: 9px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 4px;
+      transform: scale(0);
+      transition: transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    .cart-badge.show { transform: scale(1); }
+
+    /* ========== HERO ========== */
+    .hero {
+      position: relative;
+      overflow: hidden;
+      padding: clamp(48px, 8vw, 80px) clamp(16px, 4vw, 48px) clamp(40px, 6vw, 64px);
+      text-align: center;
+      background:
+        radial-gradient(ellipse 80% 60% at 50% 0%, rgba(201,168,76,0.07) 0%, transparent 70%),
+        var(--bg-secondary);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23c9a84c' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+      opacity: 0.5;
+    }
+
+    .hero-content { position: relative; z-index: 1; max-width: 700px; margin: 0 auto; }
+
+    .hero-tagline {
+      font-family: 'Cinzel', serif;
+      font-size: clamp(11px, 1.2vw, 13px);
+      letter-spacing: 4px;
+      color: var(--gold);
+      text-transform: uppercase;
+      margin-bottom: 16px;
+      opacity: 0.85;
+    }
+
+    .hero-title {
+      font-family: 'Cinzel Decorative', serif;
+      font-size: clamp(26px, 5vw, 52px);
+      font-weight: 700;
+      line-height: 1.2;
+      background: linear-gradient(135deg, #e8e8e0 30%, var(--gold-light) 60%, #e8e8e0 90%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 16px;
+    }
+
+    .hero-sub {
+      font-size: clamp(13px, 1.5vw, 16px);
+      color: var(--text-sub);
+      line-height: 1.7;
+      max-width: 520px;
+      margin: 0 auto 28px;
+    }
+
+    .hero-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(135deg, var(--gold-dim), var(--gold));
+      color: #0c0c0f;
+      border: none;
+      cursor: pointer;
+      font-family: 'Cinzel', serif;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      padding: 13px 28px;
+      border-radius: var(--radius-sm);
+      text-decoration: none;
+      transition: filter 0.2s, transform 0.15s;
+    }
+    .hero-cta:hover { filter: brightness(1.1); transform: translateY(-1px); }
+
+    /* ========== PRICING BANNER ========== */
+    .pricing-section {
+      padding: clamp(24px, 4vw, 40px) clamp(16px, 4vw, 48px);
+      background: var(--bg-primary);
+    }
+
+    .pricing-title {
+      font-family: 'Cinzel', serif;
+      font-size: clamp(13px, 1.5vw, 15px);
+      letter-spacing: 3px;
+      color: var(--gold);
+      text-align: center;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+
+    .pricing-tiers {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      flex-wrap: wrap;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    .tier-pill {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 10px 14px;
+      min-width: 90px;
+      transition: border-color 0.3s, background 0.3s, transform 0.2s;
+      cursor: default;
+      background: var(--bg-card);
+    }
+    .tier-pill.active {
+      border-color: var(--gold);
+      background: var(--gold-glow);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(201,168,76,0.2);
+    }
+
+    .tier-qty {
+      font-size: 11px;
+      color: var(--text-sub);
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+    }
+    .tier-pill.active .tier-qty { color: var(--gold-light); }
+
+    .tier-price {
+      font-family: 'Cinzel', serif;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--silver);
+    }
+    .tier-pill.active .tier-price { color: var(--gold-light); }
+
+    .tier-unit {
+      font-size: 10px;
+      color: var(--text-sub);
+      margin-top: 2px;
+    }
+
+    /* ========== PRODUCTS ========== */
+    .products-section {
+      padding: clamp(32px, 5vw, 56px) clamp(16px, 4vw, 48px);
+    }
+
+    .section-header {
+      text-align: center;
+      margin-bottom: clamp(24px, 4vw, 40px);
+    }
+
+    .section-label {
+      font-family: 'Cinzel', serif;
+      font-size: clamp(11px, 1.2vw, 13px);
+      letter-spacing: 4px;
+      color: var(--gold);
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    .section-title {
+      font-family: 'Cinzel', serif;
+      font-size: clamp(20px, 3vw, 30px);
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .section-divider {
+      width: 60px;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+      margin: 14px auto 0;
+    }
+
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 24px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .product-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      transition: transform 0.25s, border-color 0.25s, box-shadow 0.25s;
+      display: flex;
+      flex-direction: column;
+    }
+    .product-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--border-strong);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(201,168,76,0.08);
+    }
+
+    .product-cover-wrap {
+      position: relative;
+      overflow: hidden;
+      background: #0a0a0e;
+      aspect-ratio: 3/4;
+    }
+
+    .product-cover-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.4s ease;
+    }
+    .product-card:hover .product-cover-wrap img { transform: scale(1.04); }
+
+    .product-badge {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      background: rgba(12,12,15,0.85);
+      border: 1px solid var(--border);
+      color: var(--gold);
+      font-family: 'Cinzel', serif;
+      font-size: 10px;
+      letter-spacing: 1.5px;
+      padding: 4px 10px;
+      border-radius: 3px;
+      text-transform: uppercase;
+      backdrop-filter: blur(4px);
+    }
+
+    .product-in-cart {
+      position: absolute;
+      bottom: 12px;
+      right: 12px;
+      background: var(--gold);
+      color: #000;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 3px;
+      opacity: 0;
+      transform: translateY(4px);
+      transition: opacity 0.2s, transform 0.2s;
+    }
+    .product-in-cart.show { opacity: 1; transform: translateY(0); }
+
+    .product-body { padding: 18px 18px 20px; flex: 1; display: flex; flex-direction: column; }
+
+    /* ========== CATEGORY FILTER ========== */
+    .filter-section {
+      padding: 0 clamp(16px, 4vw, 48px) 28px;
+    }
+
+    .filter-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .filter-label {
+      font-family: 'Cinzel', serif;
+      font-size: 11px;
+      letter-spacing: 3px;
+      color: var(--gold);
+      text-transform: uppercase;
+    }
+
+    .filter-count {
+      font-size: 12px;
+      color: var(--text-sub);
+    }
+
+    .filter-count span {
+      color: var(--gold-light);
+      font-weight: 600;
+    }
+
+    .filter-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+    }
+
+    .filter-chip {
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      color: var(--text-sub);
+      font-size: 11px;
+      font-weight: 500;
+      padding: 5px 13px;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s, color 0.15s;
+      white-space: nowrap;
+      user-select: none;
+    }
+    .filter-chip:hover { border-color: var(--gold-dim); color: var(--text-main); }
+    .filter-chip.active {
+      background: var(--gold-glow);
+      border-color: var(--gold);
+      color: var(--gold-light);
+      font-weight: 600;
+    }
+    .filter-chip.chip-all {
+      font-family: 'Cinzel', serif;
+      font-size: 10px;
+      letter-spacing: 0.5px;
+      border-color: var(--border-strong);
+    }
+    .filter-chip.chip-all.active {
+      background: linear-gradient(135deg, var(--gold-dim), var(--gold));
+      color: #000;
+      border-color: var(--gold);
+    }
+
+    /* ========== GENRE CHIPS ON CARD ========== */
+    .product-genres {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin-bottom: 7px;
+    }
+
+    .genre-chip {
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: 0.7px;
+      color: var(--gold-dim);
+      background: rgba(201,168,76,0.07);
+      border: 1px solid rgba(201,168,76,0.15);
+      padding: 2px 7px;
+      border-radius: 10px;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .product-title {
+      font-family: 'Cinzel', serif;
+      font-size: clamp(14px, 1.4vw, 16px);
+      font-weight: 700;
+      color: var(--text-main);
+      line-height: 1.35;
+      margin-bottom: 4px;
+    }
+
+    .product-author {
+      font-size: 12px;
+      color: var(--text-sub);
+      margin-bottom: 10px;
+      font-style: italic;
+    }
+
+    .product-desc {
+      font-size: 12px;
+      color: var(--text-sub);
+      line-height: 1.65;
+      flex: 1;
+      margin-bottom: 16px;
+    }
+
+    .product-footer { display: flex; align-items: center; }
+
+    .add-btn {
+      width: 100%;
+      background: linear-gradient(135deg, var(--gold-dim), var(--gold));
+      border: none;
+      color: #0c0c0f;
+      font-family: 'Cinzel', serif;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      padding: 10px 14px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: filter 0.15s, transform 0.15s, background 0.2s;
+      white-space: nowrap;
+    }
+    .add-btn:hover { filter: brightness(1.1); transform: scale(1.02); }
+    .add-btn:active { transform: scale(0.98); }
+    .add-btn.in-cart {
+      background: linear-gradient(135deg, #3a2020, #5a2828);
+      color: #f08080;
+      border: 1px solid rgba(240,128,128,0.3);
+    }
+    .add-btn.in-cart:hover { filter: brightness(1.15); }
+
+    /* ========== CART SIDEBAR ========== */
+    .cart-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.65);
+      backdrop-filter: blur(4px);
+      z-index: 200;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s;
+    }
+    .cart-overlay.open { opacity: 1; pointer-events: all; }
+
+    .cart-sidebar {
+      position: fixed;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      width: min(420px, 100vw);
+      background: var(--bg-secondary);
+      border-left: 1px solid var(--border);
+      z-index: 201;
+      display: flex;
+      flex-direction: column;
+      transform: translateX(100%);
+      transition: transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+    .cart-sidebar.open { transform: translateX(0); }
+
+    .cart-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 20px 16px;
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+
+    .cart-header-title {
+      font-family: 'Cinzel', serif;
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--gold-light);
+      letter-spacing: 1px;
+    }
+
+    .cart-close {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--silver-dim);
+      width: 34px;
+      height: 34px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      font-size: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: color 0.15s, border-color 0.15s;
+    }
+    .cart-close:hover { color: var(--text-main); border-color: var(--silver-dim); }
+
+    .cart-items {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px 20px;
+    }
+
+    .cart-empty {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      gap: 12px;
+      color: var(--text-sub);
+    }
+    .cart-empty-icon { font-size: 48px; opacity: 0.3; }
+    .cart-empty-text { font-size: 14px; text-align: center; font-family: 'Cinzel', serif; }
+
+    .cart-item {
+      display: flex;
+      gap: 12px;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--border);
+      animation: slideIn 0.25s ease;
+    }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(12px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    .cart-item-img {
+      width: 52px;
+      height: 70px;
+      object-fit: cover;
+      border-radius: 4px;
+      flex-shrink: 0;
+      border: 1px solid var(--border);
+    }
+
+    .cart-item-info { flex: 1; min-width: 0; }
+
+    .cart-item-title {
+      font-family: 'Cinzel', serif;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-main);
+      line-height: 1.35;
+      margin-bottom: 2px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .cart-item-author {
+      font-size: 11px;
+      color: var(--text-sub);
+      font-style: italic;
+      margin-bottom: 8px;
+    }
+
+    .cart-item-controls { display: flex; align-items: center; gap: 8px; }
+
+    .cart-item-remove {
+      background: transparent;
+      border: none;
+      color: var(--text-sub);
+      cursor: pointer;
+      font-size: 16px;
+      padding: 2px;
+      margin-left: auto;
+      transition: color 0.15s;
+      display: flex;
+      align-items: center;
+    }
+    .cart-item-remove:hover { color: #e05050; }
+
+    /* ========== CART SUMMARY ========== */
+    .cart-summary {
+      border-top: 1px solid var(--border);
+      padding: 16px 20px 20px;
+      flex-shrink: 0;
+      background: var(--bg-primary);
+    }
+
+    .tier-indicator {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--gold-glow);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-sm);
+      padding: 10px 14px;
+      margin-bottom: 14px;
+    }
+
+    .tier-label {
+      font-size: 12px;
+      color: var(--text-sub);
+    }
+
+    .tier-value {
+      font-family: 'Cinzel', serif;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--gold-light);
+    }
+
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      font-size: 13px;
+      color: var(--text-sub);
+    }
+
+    .summary-total {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 10px;
+      border-top: 1px solid var(--border);
+      margin-bottom: 16px;
+    }
+
+    .summary-total-label {
+      font-family: 'Cinzel', serif;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .summary-total-value {
+      font-family: 'Cinzel', serif;
+      font-size: 20px;
+      font-weight: 900;
+      background: linear-gradient(135deg, var(--gold), var(--gold-light));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .checkout-btn {
+      width: 100%;
+      background: #25D366;
+      border: none;
+      color: #fff;
+      font-family: 'Cinzel', serif;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      padding: 15px 20px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: filter 0.2s, transform 0.15s;
+    }
+    .checkout-btn:hover { filter: brightness(1.08); transform: translateY(-1px); }
+    .checkout-btn:active { transform: scale(0.99); }
+    .checkout-btn:disabled {
+      background: var(--bg-card);
+      color: var(--text-sub);
+      cursor: not-allowed;
+      transform: none;
+      filter: none;
+    }
+
+    /* ========== MOBILE STICKY BAR ========== */
+    .mobile-cart-bar {
+      display: none;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: var(--bg-secondary);
+      border-top: 1px solid var(--border-strong);
+      padding: 12px 16px;
+      z-index: 150;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .mobile-cart-info { flex: 1; }
+
+    .mobile-cart-count {
+      font-family: 'Cinzel', serif;
+      font-size: 12px;
+      color: var(--gold);
+      margin-bottom: 2px;
+    }
+
+    .mobile-cart-total {
+      font-family: 'Cinzel', serif;
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .mobile-view-cart {
+      background: linear-gradient(135deg, var(--gold-dim), var(--gold));
+      border: none;
+      color: #000;
+      font-family: 'Cinzel', serif;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      padding: 10px 20px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    /* ========== TOAST ========== */
+    .toast-container {
+      position: fixed;
+      bottom: 80px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 500;
+      pointer-events: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .toast {
+      background: var(--bg-card);
+      border: 1px solid var(--border-strong);
+      color: var(--text-main);
+      font-size: 13px;
+      padding: 10px 18px;
+      border-radius: 20px;
+      white-space: nowrap;
+      animation: toastIn 0.3s ease, toastOut 0.3s ease 2s forwards;
+      box-shadow: var(--shadow);
+    }
+
+    @keyframes toastIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes toastOut {
+      from { opacity: 1; transform: translateY(0); }
+      to { opacity: 0; transform: translateY(-8px); }
+    }
+
+    /* ========== FOOTER ========== */
+    .footer {
+      text-align: center;
+      padding: clamp(32px, 5vw, 48px) clamp(16px, 4vw, 48px);
+      border-top: 1px solid var(--border);
+      background: var(--bg-secondary);
+    }
+
+    .footer-logo img {
+      height: 36px;
+      object-fit: contain;
+      margin: 0 auto 16px;
+      display: block;
+      opacity: 0.85;
+    }
+
+    .footer-text {
+      font-size: 12px;
+      color: var(--text-sub);
+      line-height: 1.6;
+    }
+
+    .footer-divider {
+      width: 40px;
+      height: 1px;
+      background: var(--border);
+      margin: 14px auto;
+    }
+
+    /* ========== BOOK POPUP ========== */
+    .book-popup-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.75);
+      backdrop-filter: blur(6px);
+      z-index: 400;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s;
+    }
+    .book-popup-overlay.open { opacity: 1; pointer-events: all; }
+
+    .book-popup {
+      background: var(--bg-card);
+      border: 1px solid var(--border-strong);
+      border-bottom: none;
+      border-radius: 18px 18px 0 0;
+      width: 100%;
+      max-width: 500px;
+      padding: 8px 20px 32px;
+      transform: translateY(100%);
+      transition: transform 0.32s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+    .book-popup-overlay.open .book-popup { transform: translateY(0); }
+
+    .popup-handle {
+      width: 40px;
+      height: 4px;
+      background: var(--border-strong);
+      border-radius: 2px;
+      margin: 10px auto 18px;
+    }
+
+    .popup-inner { display: flex; gap: 16px; align-items: flex-start; }
+
+    .popup-cover {
+      width: 76px;
+      flex-shrink: 0;
+      border-radius: 6px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+    .popup-cover img { width: 100%; display: block; }
+
+    .popup-info { flex: 1; min-width: 0; }
+
+    .popup-genre {
+      font-size: 10px;
+      letter-spacing: 1.5px;
+      color: var(--gold-dim);
+      text-transform: uppercase;
+      font-weight: 600;
+      margin-bottom: 5px;
+    }
+
+    .popup-title {
+      font-family: 'Cinzel', serif;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-main);
+      line-height: 1.3;
+      margin-bottom: 3px;
+    }
+
+    .popup-author {
+      font-size: 12px;
+      color: var(--text-sub);
+      font-style: italic;
+      margin-bottom: 10px;
+    }
+
+    .popup-desc {
+      font-size: 13px;
+      color: var(--text-sub);
+      line-height: 1.65;
+    }
+
+    .popup-btn-wrap { margin-top: 18px; }
+
+    /* ========== RESPONSIVE ========== */
+    @media (max-width: 640px) {
+      .product-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+      .product-body { padding: 12px 12px 14px; text-align: center; }
+      .product-genres { justify-content: center; }
+      .product-title { font-size: 12px; }
+      .product-desc { display: none; }
+      .add-btn { font-size: 10px; padding: 8px 10px; }
+      .product-footer { justify-content: center; }
+      .pricing-tiers { gap: 6px; }
+      .tier-pill { min-width: 76px; padding: 8px 10px; }
+      .mobile-cart-bar { display: flex; }
+      .products-section { padding-bottom: 96px; }
+      /* Cover penuh tanpa crop di mobile */
+      .product-cover-wrap { aspect-ratio: auto; background: #0a0a0e; }
+      .product-cover-wrap img { width: 100%; height: auto; object-fit: contain; }
+      /* Filter chips scroll horizontal */
+      .filter-chips {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        padding-bottom: 4px;
+      }
+      .filter-chips::-webkit-scrollbar { display: none; }
+    }
+
+    @media (max-width: 400px) {
+      .product-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (min-width: 641px) and (max-width: 900px) {
+      .product-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (min-width: 901px) {
+      .product-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+
+    @media (min-width: 1200px) {
+      .product-grid { grid-template-columns: repeat(5, 1fr); }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <a href="#" class="navbar-logo">
+    <img src="logo/logo horizontal.webp" alt="Citadel Bookstore">
+  </a>
+  <div class="navbar-right">
+    <button class="cart-btn" onclick="toggleCart()" aria-label="Keranjang Belanja">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/>
+      </svg>
+      <span class="cart-badge" id="cartBadge">0</span>
+    </button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-content">
+    <p class="hero-tagline">Koleksi Ebook Premium</p>
+    <h1 class="hero-title">Citadel Bookstore</h1>
+    <p class="hero-sub">Temukan buku-buku paling berpengaruh dalam sejarah — tersedia dalam format digital. Beli lebih banyak, hemat lebih besar.</p>
+    <a href="#koleksi" class="hero-cta">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>
+      Jelajahi Koleksi
+    </a>
+  </div>
+</section>
+
+<!-- PRICING TIERS -->
+<section class="pricing-section">
+  <p class="pricing-title">Harga Volume — Makin Banyak Makin Hemat</p>
+  <div class="pricing-tiers" id="pricingTiers">
+    <div class="tier-pill" data-min="1" data-max="2">
+      <span class="tier-qty">1 – 2 buku</span>
+      <span class="tier-price">Rp10.000</span>
+      <span class="tier-unit">/ buku</span>
+    </div>
+    <div class="tier-pill" data-min="3" data-max="4">
+      <span class="tier-qty">3 – 4 buku</span>
+      <span class="tier-price">Rp9.000</span>
+      <span class="tier-unit">/ buku</span>
+    </div>
+    <div class="tier-pill" data-min="5" data-max="6">
+      <span class="tier-qty">5 – 6 buku</span>
+      <span class="tier-price">Rp8.000</span>
+      <span class="tier-unit">/ buku</span>
+    </div>
+    <div class="tier-pill" data-min="7" data-max="8">
+      <span class="tier-qty">7 – 8 buku</span>
+      <span class="tier-price">Rp7.000</span>
+      <span class="tier-unit">/ buku</span>
+    </div>
+    <div class="tier-pill" data-min="9" data-max="10">
+      <span class="tier-qty">9 – 10 buku</span>
+      <span class="tier-price">Rp6.000</span>
+      <span class="tier-unit">/ buku</span>
+    </div>
+    <div class="tier-pill" data-min="11" data-max="999">
+      <span class="tier-qty">&gt; 10 buku</span>
+      <span class="tier-price">Rp5.000</span>
+      <span class="tier-unit">/ buku</span>
+    </div>
+  </div>
+</section>
+
+<!-- CATEGORY FILTER -->
+<section class="filter-section">
+  <div class="filter-header">
+    <span class="filter-label">Filter Kategori</span>
+    <span class="filter-count">Menampilkan <span id="filterCountNum">96</span> ebook</span>
+  </div>
+  <div class="filter-chips" id="filterChips"></div>
+</section>
+
+<!-- PRODUCTS -->
+<section class="products-section" id="koleksi">
+  <div class="product-grid" id="productGrid"></div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-logo">
+    <img src="logo/logo horizontal.webp" alt="Citadel Bookstore">
+  </div>
+  <p class="footer-text">Teman Baca Anda — Menghadirkan pengetahuan dalam genggaman</p>
+  <div class="footer-divider"></div>
+  <p class="footer-text" style="font-size:11px;">© 2025 Citadel Bookstore. Semua hak dilindungi.</p>
+</footer>
+
+<!-- CART OVERLAY + SIDEBAR -->
+<div class="cart-overlay" id="cartOverlay" onclick="toggleCart()"></div>
+
+<aside class="cart-sidebar" id="cartSidebar" aria-label="Keranjang Belanja">
+  <div class="cart-header">
+    <span class="cart-header-title">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:-3px;margin-right:6px"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+      Keranjang
+    </span>
+    <button class="cart-close" onclick="toggleCart()" aria-label="Tutup">×</button>
+  </div>
+
+  <div class="cart-items" id="cartItems"></div>
+
+  <div class="cart-summary" id="cartSummary">
+    <div class="tier-indicator" id="tierIndicator">
+      <div>
+        <div style="font-size:11px;color:var(--text-sub);margin-bottom:3px" id="tierNameText">Pilih buku untuk melihat harga</div>
+        <div style="font-family:'Cinzel',serif;font-size:18px;font-weight:700;color:var(--gold-light)" id="tierValueText">—</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:10px;color:var(--text-sub);margin-bottom:3px">Hemat vs harga satuan</div>
+        <div style="font-family:'Cinzel',serif;font-size:15px;font-weight:700;color:#6ddb8e" id="tierSavingText">Rp0</div>
+      </div>
+    </div>
+    <div class="summary-row">
+      <span>Total judul dipilih</span>
+      <span id="summaryQty">0 buku</span>
+    </div>
+    <div class="summary-row">
+      <span>Harga per buku</span>
+      <span id="summaryUnit">Rp0</span>
+    </div>
+    <div class="summary-total">
+      <span class="summary-total-label">Total Bayar</span>
+      <span class="summary-total-value" id="summaryTotal">Rp0</span>
+    </div>
+    <button class="checkout-btn" id="checkoutBtn" onclick="checkout()" disabled>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm0 22C6.486 22 2 17.514 2 12S6.486 2 12 2s10 4.486 10 10-4.486 10-10 10z"/></svg>
+      Checkout via WhatsApp
+    </button>
+  </div>
+</aside>
+
+<!-- MOBILE STICKY BAR -->
+<div class="mobile-cart-bar" id="mobileCat">
+  <div class="mobile-cart-info">
+    <div class="mobile-cart-count" id="mobileCartCount">0 buku dipilih</div>
+    <div class="mobile-cart-total" id="mobileCartTotal">Rp0</div>
+  </div>
+  <button class="mobile-view-cart" onclick="toggleCart()">Lihat Keranjang</button>
+</div>
+
+<!-- BOOK POPUP (mobile) -->
+<div class="book-popup-overlay" id="bookPopupOverlay" onclick="closeBookPopup(event)">
+  <div class="book-popup" id="bookPopup">
+    <div class="popup-handle"></div>
+    <div class="popup-inner">
+      <div class="popup-cover"><img id="popupCover" src="" alt=""></div>
+      <div class="popup-info">
+        <div class="popup-genre" id="popupGenre"></div>
+        <div class="popup-title" id="popupTitle"></div>
+        <div class="popup-author" id="popupAuthor"></div>
+        <div class="popup-desc" id="popupDesc"></div>
+      </div>
+    </div>
+    <div class="popup-btn-wrap">
+      <button class="add-btn" id="popupAddBtn" onclick="toggleFromPopup()"></button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+  // ==================== DATA ====================
+  const BOOKS = [
+    { id:1,  title:"1984", author:"George Orwell", cover:"cover buku/1984 by George Orwell.png", genres:["Fiction","Dystopian"], desc:"Visi gelap tentang negara pengawas totaliter yang mengontrol pikiran dan realitas melalui propaganda dan kebohongan sistematis." },
+    { id:2,  title:"A Guide to the Good Life", author:"William B. Irvine", cover:"cover buku/A Guide to the Good Life by William B. Irvine.png", genres:["Philosophy","Stoicism"], desc:"Panduan praktis menerapkan filsafat Stoik kuno dalam kehidupan modern untuk mencapai ketenangan jiwa yang tahan uji." },
+    { id:3,  title:"AI Superpowers", author:"Kai-Fu Lee", cover:"cover buku/AI Superpowers by Kai-Fu Lee.png", genres:["Technology","Business"], desc:"Perbandingan China vs Amerika dalam perlombaan AI dan dampaknya yang masif terhadap ekonomi serta lapangan kerja global." },
+    { id:4,  title:"Animal Farm", author:"George Orwell", cover:"cover buku/Animal Farm by George Orwell.png", genres:["Fiction","Political Satire"], desc:"Alegori satir yang blak-blakan tentang revolusi dan korupsi kekuasaan — semua binatang setara, tapi ada yang lebih setara." },
+    { id:5,  title:"Anna Karenina", author:"Leo Tolstoy", cover:"cover buku/Anna Karenina by Leo Tolstoy.png", genres:["Fiction","Classic"], desc:"Kisah cinta, ambisi, dan tragedi di Rusia abad ke-19 yang mengungkap kedalaman jiwa manusia dengan detail yang tak tertandingi." },
+    { id:6,  title:"Antifragile", author:"Nassim Taleb", cover:"cover buku/Antifragile by Nassim Taleb.png", genres:["Economics","Philosophy"], desc:"Cara membangun sistem, karir, dan hidup yang justru tumbuh lebih kuat dari kekacauan dan ketidakpastian." },
+    { id:7,  title:"Atlas Shrugged", author:"Ayn Rand", cover:"cover buku/Atlas Shrugged by Ayn Rand.png", genres:["Fiction","Philosophy"], desc:"Karya monumental tentang kekuatan pikiran dan individualisme — apa jadinya dunia ketika para pemikir kreatif memilih untuk berhenti?" },
+    { id:8,  title:"Atomic Habits", author:"James Clear", cover:"cover buku/Atomic Habits by James Clear.png", genres:["Self-Help","Productivity"], desc:"Sistem terbukti untuk membangun kebiasaan baik dan menghilangkan yang buruk melalui perubahan kecil yang konsisten." },
+    { id:9,  title:"Becoming Steve Jobs", author:"Brent Schlender", cover:"cover buku/Becoming Steve Jobs by Brent Schlender.png", genres:["Biography","Technology"], desc:"Biografi humanis yang mengungkap transformasi Jobs dari jenius kasar menjadi pemimpin visioner yang mengubah industri." },
+    { id:10, title:"Benjamin Franklin", author:"Walter Isaacson", cover:"cover buku/Benjamin Franklin by Walter Isaacson.png", genres:["Biography","History"], desc:"Kisah hidup Founding Father Amerika — penemu, diplomat, penulis, dan filsuf otodidak sejati yang mendefinisikan Amerika modern." },
+    { id:11, title:"Between the World and Me", author:"Ta-Nehisi Coates", cover:"cover buku/Between the World and Me by Ta-Nehisi Coates.png", genres:["Memoir","Sociology"], desc:"Surat penuh kejujuran dan kepedihan tentang pengalaman menjadi orang kulit hitam di Amerika yang masih bergulat dengan rasisme." },
+    { id:12, title:"Bird by Bird", author:"Anne Lamott", cover:"cover buku/Bird by Bird by Anne Lamott.png", genres:["Writing","Self-Help"], desc:"Panduan menulis yang jujur dan inspiratif — mulai dari satu langkah kecil demi satu langkah kecil hingga karya yang selesai." },
+    { id:13, title:"Blitzscaling", author:"Reid Hoffman", cover:"cover buku/Blitzscaling by Reid Hoffman.png", genres:["Business","Entrepreneurship"], desc:"Strategi pertumbuhan ekstrem Silicon Valley untuk membangun perusahaan global yang mendominasi pasar dalam waktu singkat." },
+    { id:14, title:"Brave New World", author:"Aldous Huxley", cover:"cover buku/Brave New World by Aldous Huxley.png", genres:["Fiction","Dystopian"], desc:"Dunia utopia yang ternyata adalah dystopia — kebebasan dikorbankan demi stabilitas, kesenangan, dan kontrol sosial yang sempurna." },
+    { id:15, title:"Creativity, Inc.", author:"Ed Catmull", cover:"cover buku/Creativity, Inc.  by Ed Catmull.png", genres:["Business","Management"], desc:"Bagaimana Pixar membangun budaya kreativitas dan kepercayaan yang melahirkan film-film animasi terbaik sepanjang masa." },
+    { id:16, title:"Crime and Punishment", author:"Fyodor Dostoevsky", cover:"cover buku/Crime and Punishment by Fyodor Dostoevsky.png", genres:["Fiction","Classic"], desc:"Pergulatan moral seorang mahasiswa miskin setelah melakukan pembunuhan — eksplorasi mendalam tentang rasa bersalah dan penebusan dosa." },
+    { id:17, title:"Crossing the Chasm", author:"Geoffrey A. Moore", cover:"cover buku/Crossing the Chasm by Geoffrey A. Moore.png", genres:["Business","Marketing"], desc:"Strategi klasik untuk membawa produk teknologi dari early adopters ke pasar mainstream yang masif dan menguntungkan." },
+    { id:18, title:"Einstein", author:"Walter Isaacson", cover:"cover buku/Einstein by Walter Isaacson.png", genres:["Biography","Science"], desc:"Kisah hidup jenius relativitas — pikirannya yang revolusioner, pribadinya yang kompleks, dan warisannya yang mengubah fisika modern." },
+    { id:19, title:"Endurance", author:"Alfred Lansing", cover:"cover buku/Endurance by Alfred Lansing.png", genres:["History","Adventure"], desc:"Kisah luar biasa ekspedisi Shackleton di Antartika — bertahan hidup di lingkungan paling keras di bumi tanpa satu nyawa pun hilang." },
+    { id:20, title:"Enlightenment Now", author:"Steven Pinker", cover:"cover buku/Enlightenment Now by Steven Pinker.png", genres:["Science","Philosophy"], desc:"Argumen berbasis data yang meyakinkan bahwa dunia terus membaik berkat sains, akal budi, dan humanisme modern." },
+    { id:21, title:"Everything Is Figureoutable", author:"Marie Forleo", cover:"cover buku/Everything Is Figureoutable by Marie Forleo.png", genres:["Self-Help","Motivation"], desc:"Framework praktis untuk mengatasi hambatan dan ketakutan — satu keyakinan sederhana yang bisa mengubah segalanya." },
+    { id:22, title:"Finite and Infinite Games", author:"James Carse", cover:"cover buku/Finite and Infinite Games by James Carse.png", genres:["Philosophy","Psychology"], desc:"Dua jenis permainan: yang bertujuan menang, dan yang bertujuan terus bermain — kerangka berpikir revolusioner tentang kehidupan." },
+    { id:23, title:"Give and Take", author:"Adam Grant", cover:"cover buku/Give and Take by Adam Grant.png", genres:["Psychology","Business"], desc:"Mengapa orang yang paling dermawan justru paling sukses dalam jangka panjang — ilmu di balik reciprocity dan kolaborasi." },
+    { id:24, title:"Good to Great", author:"Jim Collins", cover:"cover buku/Good to Great by Jim Collins.png", genres:["Business","Management"], desc:"Riset mendalam tentang apa yang membedakan perusahaan biasa dari yang benar-benar luar biasa dan berkelanjutan." },
+    { id:25, title:"Guns, Germs, and Steel", author:"Jared Diamond", cover:"cover buku/Guns, Germs, and Steel by Jared Diamond.png", genres:["History","Anthropology"], desc:"Mengapa peradaban Eropa mendominasi dunia? Jawaban mengejutkan dari geografi, biologi, dan keberuntungan sejarah." },
+    { id:26, title:"High Growth Handbook", author:"Elad Gil", cover:"cover buku/High Growth Handbook by Elad Gil.png", genres:["Business","Entrepreneurship"], desc:"Panduan operasional dari para pendiri dan investor terbaik Silicon Valley untuk membangun startup bernilai miliaran dolar." },
+    { id:27, title:"High Output Management", author:"Andrew S. Grove", cover:"cover buku/High Output Management by Andrew S. Grove.png", genres:["Business","Management"], desc:"Filosofi manajemen Andy Grove dari Intel — bagaimana memaksimalkan output tim secara sistematis dan terukur." },
+    { id:28, title:"Homo Deus", author:"Yuval Noah Harari", cover:"cover buku/Homo Deus by Yuval Noah Harari.png", genres:["History","Philosophy"], desc:"Proyeksi masa depan Harari: ke mana manusia menuju setelah berhasil menaklukkan kelaparan, perang, dan penyakit?" },
+    { id:29, title:"How To Win Friends and Influence People", author:"Dale Carnegie", cover:"cover buku/How To Win Friends and Influence People by Dale Carnegie.png", genres:["Self-Help","Psychology"], desc:"Prinsip abadi yang terbukti efektif untuk membangun hubungan, memengaruhi orang lain, dan menjadi pemimpin yang dicintai." },
+    { id:30, title:"How to Change Your Mind", author:"Michael Pollan", cover:"cover buku/How to Change Your Mind by Michael Pollan.png", genres:["Science","Psychology"], desc:"Psilocybin, meditasi, dan ilmu di balik bagaimana pikiran kita bisa direset — eksplorasi jujur tentang kesadaran manusia." },
+    { id:31, title:"Influence: The Psychology of Persuasion", author:"Robert Cialdini", cover:"cover buku/Influence The Psychology of Persuasion.png", genres:["Psychology","Business"], desc:"Enam prinsip psikologi universal yang digunakan untuk memengaruhi keputusan — dan cara melindungi diri darinya." },
+    { id:32, title:"Jonathan Livingston Seagull", author:"Richard Bach", cover:"cover buku/Jonathan Livingston Seagull by Richard Bach.png", genres:["Fiction","Philosophy"], desc:"Kisah seekor camar yang menolak batasan kawanan dan mengejar kesempurnaan — metafora indah tentang potensi tanpa batas." },
+    { id:33, title:"Lean In", author:"Sheryl Sandberg", cover:"cover buku/Lean In by Sheryl Sandberg.png", genres:["Business","Leadership"], desc:"Tantangan Sheryl Sandberg kepada perempuan untuk mengambil tempat di meja kekuasaan dan memimpin tanpa rasa bersalah." },
+    { id:34, title:"Man's Search for Meaning", author:"Viktor E. Frankl", cover:"cover buku/Man's Search for Meaning by Viktor E. Frankl.png", genres:["Psychology","Philosophy","Memoir"], desc:"Psikiater yang selamat dari kamp Nazi menemukan bahwa makna hidup adalah kunci untuk bertahan dari penderitaan apapun." },
+    { id:35, title:"Mastery", author:"Robert Greene", cover:"cover buku/Mastery by Robert Greene.png", genres:["Self-Help","Psychology"], desc:"Bagaimana para maestro dunia mencapai puncak kemampuan — pola tersembunyi di balik keahlian level genius." },
+    { id:36, title:"Measure What Matters", author:"John Doerr", cover:"cover buku/Measure What Matters by John Doerr.png", genres:["Business","Management"], desc:"Sistem OKR yang dipakai Google dan Intel untuk menetapkan dan mencapai tujuan-tujuan ambisius secara konsisten." },
+    { id:37, title:"Meditations", author:"Marcus Aurelius", cover:"cover buku/Meditations by Marcus Aurelius.png", genres:["Philosophy","Stoicism"], desc:"Catatan pribadi kaisar-filsuf Romawi tentang disiplin diri, kerendahan hati, dan seni hidup dengan integritas penuh." },
+    { id:38, title:"Mindset", author:"Carol S. Dweck", cover:"cover buku/Mindset by Carol S. Dweck.png", genres:["Psychology","Self-Help"], desc:"Perbedaan mendasar antara fixed mindset dan growth mindset — dan bagaimana itu menentukan batas kemampuanmu." },
+    { id:39, title:"One Hundred Years of Solitude", author:"Gabriel García Márquez", cover:"cover buku/One Hundred Years of Solitude by Gabriel Garcia Marquez.png", genres:["Fiction","Magical Realism"], desc:"Saga epik keluarga Buendía selama tujuh generasi di kota Macondo yang penuh keajaiban, cinta, dan kutukan abadi." },
+    { id:40, title:"Originals", author:"Adam Grant", cover:"cover buku/Originals by Adam Grant.png", genres:["Psychology","Business"], desc:"Bagaimana non-conformis mengubah dunia — dan cara siapapun bisa menjadi champion of new ideas yang sesungguhnya." },
+    { id:41, title:"Outliers", author:"Malcolm Gladwell", cover:"cover buku/Outliers by Malcolm Gladwell.png", genres:["Psychology","Sociology"], desc:"Keberhasilan bukan semata bakat — Gladwell membongkar rahasia tak terduga di balik orang-orang paling sukses dunia." },
+    { id:42, title:"Play Nice But Win", author:"Michael Dell", cover:"cover buku/Play Nice But Win by Michael Dell.png", genres:["Biography","Business"], desc:"Kisah jatuh bangun Michael Dell membangun kerajaan teknologi dari kamar asrama kampus hingga perusahaan Fortune 500." },
+    { id:43, title:"Principles", author:"Ray Dalio", cover:"cover buku/Principles by Ray Dalio.png", genres:["Business","Self-Help"], desc:"Prinsip-prinsip hidup dan kerja dari pendiri hedge fund terbesar dunia yang bisa diterapkan siapapun untuk sukses." },
+    { id:44, title:"Ready Player One", author:"Ernest Cline", cover:"cover buku/Ready Player One by Ernest Cline.png", genres:["Science Fiction","Fantasy"], desc:"Petualangan virtual reality epik di dunia dystopia masa depan yang penuh nostalgia budaya pop era 80-an." },
+    { id:45, title:"Rework", author:'David Heinemeier Hansson', cover:'cover buku/Rework by David “DHH” Heinemeier Hansson.png', genres:["Business","Productivity"], desc:"Bantah semua asumsi konvensional tentang bisnis — buku ini membuktikan lebih sedikit justru menghasilkan lebih banyak." },
+    { id:46, title:"Sapiens", author:"Yuval Noah Harari", cover:"cover buku/Sapiens by Yuval Noah Harari.png", genres:["History","Anthropology"], desc:"Bagaimana Homo sapiens naik dari primata biasa menjadi penguasa bumi — kisah terlengkap umat manusia dalam satu buku." },
+    { id:47, title:"Shoe Dog", author:"Phil Knight", cover:"cover buku/Shoe Dog by Phil Knight.png", genres:["Biography","Business"], desc:"Kisah penuh perjuangan Phil Knight membangun Nike dari nol — jujur, getir, dan sangat menginspirasi." },
+    { id:48, title:"Siddhartha", author:"Hermann Hesse", cover:"cover buku/Siddhartha by Hermann Hesse.png", genres:["Fiction","Philosophy"], desc:"Perjalanan spiritual seorang pemuda melepaskan kemewahan dan dogma untuk menemukan kebenaran dan kedamaian sejati." },
+    { id:49, title:"Skin in the Game", author:"Nassim Taleb", cover:"cover buku/Skin in the Game by Nassim Taleb.png", genres:["Economics","Philosophy"], desc:"Hanya mereka yang menanggung risiko sendiri yang layak memberi nasihat — prinsip akuntabilitas yang mengubah cara berpikir." },
+    { id:50, title:"Snow Crash", author:"Neal Stephenson", cover:"cover buku/Snow Crash by Neal Stephenson.png", genres:["Science Fiction","Cyberpunk"], desc:"Novel cyberpunk visioner yang memprediksi metaverse dan budaya internet jauh sebelum keduanya benar-benar ada." },
+    { id:51, title:"Start with Why", author:"Simon Sinek", cover:"cover buku/Start with Why by Simon Sinek.png", genres:["Business","Leadership"], desc:"Pemimpin dan organisasi terbaik dunia tidak hanya tahu APA yang mereka lakukan — mereka tahu MENGAPA." },
+    { id:52, title:"Steve Jobs", author:"Walter Isaacson", cover:"cover buku/Steve Jobs by Walter Isaacson.png", genres:["Biography","Technology"], desc:"Biografi komprehensif Jobs oleh Isaacson — jenius, perfeksionis, dan pemimpin yang mendefinisikan ulang seluruh industri teknologi." },
+    { id:53, title:"Surely You're Joking, Mr. Feynman!", author:"Richard P. Feynman", cover:"cover buku/Surely You're Joking, Mr. Feynman! by Richard P. Feynman.png", genres:["Biography","Science"], desc:"Kenangan lucu dan mengagumkan fisikawan jenius peraih Nobel tentang rasa ingin tahu yang tidak pernah padam." },
+    { id:54, title:"Tao Te Ching", author:"Lao Tzu", cover:"cover buku/Tao Te Ching by Lao Tzu.png", genres:["Philosophy","Spirituality"], desc:"81 puisi tentang cara hidup selaras dengan alam, menerima paradoks, dan menemukan kekuatan sejati dalam kelembutan." },
+    { id:55, title:"The 4-Hour Workweek", author:"Tim Ferriss", cover:"cover buku/The 4-Hour Workweek by Tim Ferriss.png", genres:["Self-Help","Business"], desc:"Panduan melarikan diri dari rutinitas 9-5 dan membangun gaya hidup ideal melalui otomasi dan delegasi cerdas." },
+    { id:56, title:"The 7 Habits of Highly Effective People", author:"Stephen R. Covey", cover:"cover buku/The 7 Habits of Highly Effective People by Stephen R. Covey.png", genres:["Self-Help","Business"], desc:"Tujuh prinsip abadi untuk efektivitas pribadi dan profesional yang telah mengubah cara jutaan orang menjalani hidup." },
+    { id:57, title:"The Alchemist", author:"Paulo Coelho", cover:"cover buku/The Alchemist by Paulo Coelho.png", genres:["Fiction","Philosophy"], desc:"Kisah Santiago si penggembala mengejar impiannya — dan pelajaran bahwa harta sejati selalu ada lebih dekat dari yang kita kira." },
+    { id:58, title:"The Art Of War", author:"Sun Tzu", cover:"cover buku/The Art Of War by Sun Tzu.png", genres:["Strategy","Philosophy"], desc:"Strategi militer Sun Tzu dari 2500 tahun lalu yang tetap relevan dalam bisnis, negosiasi, dan persaingan modern." },
+    { id:59, title:"The Autobiography of Benjamin Franklin", author:"Benjamin Franklin", cover:"cover buku/The Autobiography of Benjamin Franklin by Benjamin Franklin.png", genres:["Biography","History"], desc:"Kisah hidup Franklin dalam kata-katanya sendiri — dari pencetak miskin menjadi negarawan paling dihormati Amerika." },
+    { id:60, title:"The Beginning of Infinity", author:"David Deutsch", cover:"cover buku/The Beginning of Infinity by David Deutsch.png", genres:["Science","Philosophy"], desc:"Argumen yang mengagumkan bahwa manusia dan pengetahuannya tidak memiliki batas — semua masalah pada akhirnya bisa dipecahkan." },
+    { id:61, title:"The Better Angels of Our Nature", author:"Steven Pinker", cover:"cover buku/The Better Angels of Our Nature by Steven Pinker.png", genres:["History","Psychology"], desc:"Data mengejutkan yang membuktikan kekerasan manusia terus menurun — dunia lebih damai dari yang terasa di berita." },
+    { id:62, title:"The Black Swan", author:"Nassim Taleb", cover:"cover buku/The Black Swan by Nassim Taleb.png", genres:["Economics","Philosophy"], desc:"Peristiwa langka tak terprediksi yang mengubah segalanya — dan cara berpikir agar tidak dibutakan oleh ketidaktahuan kita." },
+    { id:63, title:"The Catcher in the Rye", author:"J.D. Salinger", cover:"cover buku/The Catcher in the Rye by J.D. Salinger.png", genres:["Fiction","Classic"], desc:"Kisah Holden Caulfield yang memberontak terhadap kepalsuan dunia orang dewasa — ikonik dan tetap relevan lintas generasi." },
+    { id:64, title:"The Changing World Order", author:"Ray Dalio", cover:"cover buku/The Changing World Order by Ray Dalio.png", genres:["Economics","History"], desc:"Analisis siklus sejarah kekaisaran dunia dan ke mana Amerika dan China akan melangkah dalam persaingan global berikutnya." },
+    { id:65, title:"The Checklist Manifesto", author:"Atul Gawande", cover:"cover buku/The Checklist Manifesto by Atul Gawande.png", genres:["Productivity","Medicine"], desc:"Bagaimana checklist sederhana menyelamatkan nyawa di ruang operasi dan cockpit pesawat — kekuatan sistem terhadap error manusia." },
+    { id:66, title:"The Coddling of the American Mind", author:"Greg Lukianoff", cover:"cover buku/The Coddling of the American Mind by Greg Lukianoff.png", genres:["Sociology","Psychology"], desc:"Mengapa generasi muda semakin fragil — dan bagaimana niat baik yang salah arah justru melemahkan ketangguhan mereka." },
+    { id:67, title:"The Coming Wave", author:"Mustafa Suleyman", cover:"cover buku/The Coming Wave by Mustafa Suleyman.png", genres:["Technology","Politics"], desc:"AI dan bioteknologi akan menjadi gelombang teknologi terbesar dalam sejarah — dan kita belum siap menghadapinya." },
+    { id:68, title:"The Fountainhead", author:"Ayn Rand", cover:"cover buku/The Fountainhead by Ayn Rand.png", genres:["Fiction","Philosophy"], desc:"Howard Roark, arsitek idealis yang menolak segala kompromi — kisah tentang integritas total melawan tekanan konformitas." },
+    { id:69, title:"The Four Agreements", author:"Don Miguel Ruiz", cover:"cover buku/The Four Agreements by Don Miguel Ruiz.png", genres:["Spirituality","Self-Help"], desc:"Empat komitmen sederhana dari kebijaksanaan Toltec kuno untuk hidup lebih bebas, autentik, dan penuh kedamaian." },
+    { id:70, title:"The Great Gatsby", author:"F. Scott Fitzgerald", cover:"cover buku/The Great Gatsby by F. Scott Fitzgerald.png", genres:["Fiction","Classic"], desc:"Kemewahan, obsesi, dan kehancuran di era Jazz Amerika — novel yang mendefinisikan rapuhnya American Dream." },
+    { id:71, title:"The Hard Thing About Hard Things", author:"Ben Horowitz", cover:"cover buku/The Hard Thing About Hard Things by Ben Horowitz.png", genres:["Business","Management"], desc:"Tidak ada formula ajaib untuk memimpin startup — hanya keberanian menghadapi keputusan yang tidak punya jawaban mudah." },
+    { id:72, title:"The Hitchhiker's Guide to the Galaxy", author:"Douglas Adams", cover:"cover buku/The Hitchhiker's Guide to the Galaxy by Douglas Adams.png", genres:["Science Fiction","Humor"], desc:"Petualangan absurd melintasi galaksi yang membuktikan bahwa jawaban atas segala pertanyaan besar di alam semesta adalah 42." },
+    { id:73, title:"The Innovator's Dilemma", author:"Clayton M. Christensen", cover:"cover buku/The Innovator's Dilemma by Clayton M. Christensen.png", genres:["Business","Technology"], desc:"Mengapa perusahaan terbaik pun bisa gagal — dan bagaimana inovasi disruptif menggulingkan raksasa yang terlena." },
+    { id:74, title:"The Lean Startup", author:"Eric Ries", cover:"cover buku/The Lean Startup by Eric Ries.png", genres:["Business","Entrepreneurship"], desc:"Build-Measure-Learn: metodologi untuk menciptakan produk yang benar-benar diinginkan pasar, bukan yang kamu kira diinginkan." },
+    { id:75, title:"The Lessons of History", author:"Will & Ariel Durant", cover:"cover buku/The Lessons of History by Will & Ariel Durant.png", genres:["History","Philosophy"], desc:"Will dan Ariel Durant merangkum ribuan tahun sejarah manusia dalam pola-pola yang terus berulang hingga hari ini." },
+    { id:76, title:"The Magic of Thinking Big", author:"David J. Schwartz", cover:"cover buku/The Magic of Thinking Big by David J. Schwartz.png", genres:["Self-Help","Motivation"], desc:"Cara berpikir besar, melampaui batas yang kamu pasang sendiri, dan meraih hasil yang jauh melampaui ekspektasi." },
+    { id:77, title:"The Obstacle Is the Way", author:"Ryan Holiday", cover:"cover buku/The Obstacle Is the Way by Ryan Holiday.png", genres:["Philosophy","Self-Help"], desc:"Filosofi Stoik tentang mengubah hambatan menjadi bahan bakar — setiap rintangan menyimpan kesempatan yang tersembunyi." },
+    { id:78, title:"The Old Man and the Sea", author:"Ernest Hemingway", cover:"cover buku/The Old Man and the Sea by Ernest Hemingway.png", genres:["Fiction","Classic"], desc:"Santiago, nelayan tua yang berjuang sendirian melawan marlin raksasa — kisah keberanian dan martabat manusia yang paling murni." },
+    { id:79, title:"The Oxford Shakespeare", author:"William Shakespeare", cover:"cover buku/The Oxford Shakespeare by William Shakespeare.png", genres:["Literature","Drama"], desc:"Kumpulan lengkap drama dan soneta Shakespeare — warisan sastra Inggris yang paling berpengaruh sepanjang masa." },
+    { id:80, title:"The Power of Habit", author:"Charles Duhigg", cover:"cover buku/The Power of Habit by Charles Duhigg.png", genres:["Psychology","Self-Help"], desc:"Ilmu di balik bagaimana kebiasaan terbentuk, bagaimana bisa diubah, dan mengapa itu menentukan takdir hidupmu." },
+    { id:81, title:"The Rational Optimist", author:"Matt Ridley", cover:"cover buku/The Rational Optimist by Matt Ridley.png", genres:["Economics","Science"], desc:"Pertukaran ide dan perdagangan bebas adalah mesin terbesar kemajuan peradaban — argumen optimisme yang berbasis fakta." },
+    { id:82, title:"The Ride of a Lifetime", author:"Robert Iger", cover:"cover buku/The Ride of a Lifetime by Robert Iger.png", genres:["Biography","Business"], desc:"Pelajaran kepemimpinan Robert Iger selama 15 tahun memimpin Disney — dari krisis hampir bangkrut hingga akuisisi Marvel dan Pixar." },
+    { id:83, title:"The Road", author:"Cormac McCarthy", cover:"cover buku/The Road by Cormac McCarthy.png", genres:["Fiction","Dystopian"], desc:"Ayah dan anak melintasi Amerika pasca-apokalipse — survival yang brutal namun menyimpan cinta yang mengharukan dan abadi." },
+    { id:84, title:"The Score Takes Care of Itself", author:"Bill Walsh", cover:"cover buku/The Score Takes Care of Itself by Bill Walsh.png", genres:["Sports","Leadership"], desc:"Filosofi kepemimpinan Bill Walsh yang mengubah tim terburuk NFL menjadi dinasti juara tiga kali dalam satu dekade." },
+    { id:85, title:"The Selfish Gene", author:"Richard Dawkins", cover:"cover buku/The Selfish Gene by Richard Dawkins.png", genres:["Science","Biology"], desc:"Richard Dawkins menjelaskan evolusi dari perspektif gen — dan memperkenalkan konsep meme untuk pertama kalinya." },
+    { id:86, title:"The True Believer", author:"Eric Hoffer", cover:"cover buku/The True Believer by Eric Hoffer.png", genres:["Sociology","Psychology"], desc:"Psikologi massa gerakan fanatik — mengapa orang bergabung dengan gerakan ekstrem dan apa yang sesungguhnya menggerakkan mereka." },
+    { id:87, title:"The Untethered Soul", author:"Michael A. Singer", cover:"cover buku/The Untethered Soul by Michael A. Singer.png", genres:["Spirituality","Self-Help"], desc:"Cara membebaskan diri dari kekuatan pikiran dan emosi yang selama ini mengendalikanmu tanpa kamu sadari." },
+    { id:88, title:"The War of Art", author:"Steven Pressfield", cover:"cover buku/The War of Art by Steven Pressfield.png", genres:["Self-Help","Creativity"], desc:"Resistance — musuh terbesar setiap kreator. Cara mengalahkannya dan mulai berkarya setiap hari tanpa menunggu inspirasi." },
+    { id:89, title:"The Wealth of Nations", author:"Adam Smith", cover:"cover buku/The Wealth of Nations by Adam Smith.png", genres:["Economics","Philosophy"], desc:"Fondasi ekonomi modern: teori pasar bebas, pembagian kerja, dan tangan tak terlihat yang mengatur keseimbangan pasar." },
+    { id:90, title:"Thinking in Bets", author:"Annie Duke", cover:"cover buku/Thinking in Bets by Annie Duke.png", genres:["Psychology","Decision Making"], desc:"Keputusan terbaik pun bisa menghasilkan hasil buruk — cara berpikir seperti pemain poker profesional untuk mengambil keputusan lebih baik." },
+    { id:91, title:"Thinking, Fast and Slow", author:"Daniel Kahneman", cover:"cover buku/Thinking, Fast and Slow by Daniel Kahneman.png", genres:["Psychology","Science"], desc:"Dua sistem berpikir manusia: cepat-intuitif dan lambat-rasional — dan bagaimana bias tersembunyi mempengaruhi setiap keputusan." },
+    { id:92, title:"Tools of Titans", author:"Tim Ferriss", cover:"cover buku/Tools of Titans by Tim Ferriss.png", genres:["Self-Help","Business"], desc:"Kebiasaan, rutinitas, dan rahasia dari 200+ tokoh paling sukses dunia yang diwawancara Tim Ferriss secara mendalam." },
+    { id:93, title:"What We Owe the Future", author:"William MacAskill", cover:"cover buku/What We Owe the Future by William MacAskill.png", genres:["Philosophy","Ethics"], desc:"Kita memiliki tanggung jawab moral terhadap generasi yang belum lahir — argumen longtermism yang kuat dan menggugah." },
+    { id:94, title:"When Breath Becomes Air", author:"Paul Kalanithi", cover:"cover buku/When Breath Becomes Air by Paul Kalanithi.png", genres:["Memoir","Medicine"], desc:"Seorang dokter bedah saraf yang sekarat menulis tentang makna hidup, kematian, dan warisan yang ditinggalkan — menyentuh dan jujur." },
+    { id:95, title:"Zen and the Art of Motorcycle Maintenance", author:"Robert M. Pirsig", cover:"cover buku/Zen and the Art of Motorcycle Maintenance by Robert M. Pirsig.png", genres:["Philosophy","Fiction"], desc:"Perjalanan motor sambil merenungkan kualitas, teknologi, dan makna hidup yang sesungguhnya dalam filosofi yang membekas." },
+    { id:96, title:"Zero to One", author:"Peter Thiel", cover:"cover buku/Zero to One by Peter Thiel.png", genres:["Business","Entrepreneurship"], desc:"Membangun masa depan bukan dengan menduplikasi yang sudah ada, tapi menciptakan yang benar-benar baru dari nol menjadi satu." },
+  ];
+
+  const WA_NUMBER = "6285727466415";
+
+  // ==================== STATE ====================
+  let cart = {};            // { bookId: 1 }
+  let activeFilters = new Set(); // set of genre strings
+
+  // ==================== PRICING ====================
+  function getPricePerUnit(totalQty) {
+    if (totalQty <= 2)  return 10000;
+    if (totalQty <= 4)  return 9000;
+    if (totalQty <= 6)  return 8000;
+    if (totalQty <= 8)  return 7000;
+    if (totalQty <= 10) return 6000;
+    return 5000;
+  }
+
+  function getTotalQtyInCart() { return Object.keys(cart).length; }
+
+  function formatRupiah(n) { return 'Rp' + n.toLocaleString('id-ID'); }
+
+  function escAttr(s) { return s.replace(/"/g, '&quot;'); }
+
+  // ==================== CATEGORY FILTER ====================
+  function getAllGenres() {
+    const set = new Set();
+    BOOKS.forEach(b => b.genres.forEach(g => set.add(g)));
+    return [...set].sort();
+  }
+
+  function renderFilters() {
+    const container = document.getElementById('filterChips');
+    const allGenres = getAllGenres();
+    const allChip = `<button class="filter-chip chip-all ${activeFilters.size === 0 ? 'active' : ''}" onclick="clearFilters()">Semua</button>`;
+    const chips = allGenres.map(g =>
+      `<button class="filter-chip ${activeFilters.has(g) ? 'active' : ''}" onclick="toggleFilter('${g.replace(/'/g, "\\'")}')">${g}</button>`
+    ).join('');
+    container.innerHTML = allChip + chips;
+  }
+
+  function toggleFilter(genre) {
+    if (activeFilters.has(genre)) {
+      activeFilters.delete(genre);
+    } else {
+      activeFilters.add(genre);
+    }
+    renderFilters();
+    renderProducts();
+  }
+
+  function clearFilters() {
+    activeFilters.clear();
+    renderFilters();
+    renderProducts();
+  }
+
+  function getFilteredBooks() {
+    if (activeFilters.size === 0) return BOOKS;
+    return BOOKS.filter(b => b.genres.some(g => activeFilters.has(g)));
+  }
+
+  // ==================== RENDER PRODUCTS ====================
+  function renderProducts() {
+    const grid = document.getElementById('productGrid');
+    const visible = getFilteredBooks();
+    document.getElementById('filterCountNum').textContent = visible.length;
+
+    if (visible.length === 0) {
+      grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:48px 16px;color:var(--text-sub);font-family:'Cinzel',serif;font-size:14px">Tidak ada buku untuk kategori ini</div>`;
+      return;
+    }
+
+    grid.innerHTML = visible.map(book => {
+      const genreChips = book.genres.map(g => `<span class="genre-chip">${g}</span>`).join('');
+      const safeCover = escAttr(book.cover);
+      return `
+      <div class="product-card" id="card-${book.id}">
+        <div class="product-cover-wrap" onclick="onCoverClick(${book.id})" style="cursor:pointer">
+          <img src="${safeCover}" alt="${escAttr(book.title)}" loading="lazy">
+          <span class="product-badge">${book.genres[0]}</span>
+          <span class="product-in-cart" id="inCart-${book.id}">✓ Di Keranjang</span>
+        </div>
+        <div class="product-body">
+          <div class="product-genres">${genreChips}</div>
+          <h3 class="product-title">${book.title}</h3>
+          <p class="product-author">${book.author}</p>
+          <p class="product-desc">${book.desc}</p>
+          <div class="product-footer">
+            <button class="add-btn" id="addBtn-${book.id}" onclick="toggleCart_book(${book.id})">+ Pilih Buku Ini</button>
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+
+    // Re-sync button states after re-render
+    visible.forEach(book => {
+      const indicator = document.getElementById(`inCart-${book.id}`);
+      if (indicator) indicator.classList.toggle('show', !!cart[book.id]);
+      const btn = document.getElementById(`addBtn-${book.id}`);
+      if (btn) {
+        if (cart[book.id]) { btn.textContent = '✓ Dipilih — Batalkan'; btn.classList.add('in-cart'); }
+        else { btn.textContent = '+ Pilih Buku Ini'; btn.classList.remove('in-cart'); }
+      }
+    });
+  }
+
+  // ==================== CART OPERATIONS ====================
+  function toggleCart_book(bookId) {
+    const book = BOOKS.find(b => b.id === bookId);
+    if (cart[bookId]) {
+      delete cart[bookId];
+      showToast(`${book.title} dihapus dari pilihan`);
+    } else {
+      cart[bookId] = 1;
+      showToast(`${book.title} ditambahkan ✓`);
+    }
+    updateUI();
+  }
+
+  function removeFromCart(bookId) {
+    delete cart[bookId];
+    updateUI();
+  }
+
+  // ==================== UI UPDATE ====================
+  function updateUI() {
+    const totalQty = getTotalQtyInCart();
+    const pricePerUnit = totalQty > 0 ? getPricePerUnit(totalQty) : 0;
+    const totalPrice = totalQty * pricePerUnit;
+
+    // Badge
+    const badge = document.getElementById('cartBadge');
+    badge.textContent = totalQty;
+    badge.classList.toggle('show', totalQty > 0);
+
+    // Tier pills
+    document.querySelectorAll('.tier-pill').forEach(pill => {
+      const min = parseInt(pill.dataset.min);
+      const max = parseInt(pill.dataset.max);
+      pill.classList.toggle('active', totalQty >= min && totalQty <= max);
+    });
+
+    // Cart items
+    const cartItemsEl = document.getElementById('cartItems');
+    const cartIds = Object.keys(cart).map(Number);
+
+    if (cartIds.length === 0) {
+      cartItemsEl.innerHTML = `
+        <div class="cart-empty">
+          <div class="cart-empty-icon">📚</div>
+          <p class="cart-empty-text">Keranjangmu masih kosong.<br>Tambahkan ebook pilihanmu!</p>
+        </div>`;
+    } else {
+      cartItemsEl.innerHTML = cartIds.map(id => {
+        const book = BOOKS.find(b => b.id === id);
+        return `
+          <div class="cart-item">
+            <img class="cart-item-img" src="${book.cover}" alt="${book.title}">
+            <div class="cart-item-info">
+              <div class="cart-item-title">${book.title}</div>
+              <div class="cart-item-author">${book.author}</div>
+              <div class="cart-item-controls">
+                <button class="cart-item-remove" onclick="removeFromCart(${id})" aria-label="Hapus">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg>
+                  Hapus
+                </button>
+              </div>
+            </div>
+          </div>`;
+      }).join('');
+    }
+
+    // Summary
+    const normalPrice = 10000;
+    const savingsPerBook = normalPrice - pricePerUnit;
+    const totalSavings = savingsPerBook * totalQty;
+    const tierName = totalQty === 0 ? 'Pilih buku untuk melihat harga'
+      : totalQty <= 2  ? 'Tier 1 — 1 s/d 2 buku'
+      : totalQty <= 4  ? 'Tier 2 — 3 s/d 4 buku'
+      : totalQty <= 6  ? 'Tier 3 — 5 s/d 6 buku'
+      : totalQty <= 8  ? 'Tier 4 — 7 s/d 8 buku'
+      : totalQty <= 10 ? 'Tier 5 — 9 s/d 10 buku'
+      : 'Tier 6 — lebih dari 10 buku';
+
+    document.getElementById('tierNameText').textContent = tierName;
+    document.getElementById('tierValueText').textContent = totalQty > 0 ? formatRupiah(pricePerUnit) + '/buku' : '—';
+    document.getElementById('tierSavingText').textContent = totalQty > 0 && totalSavings > 0 ? formatRupiah(totalSavings) : 'Rp0';
+    document.getElementById('summaryQty').textContent = totalQty + ' buku';
+    document.getElementById('summaryUnit').textContent = totalQty > 0 ? formatRupiah(pricePerUnit) + '/buku' : 'Rp0';
+    document.getElementById('summaryTotal').textContent = formatRupiah(totalPrice);
+
+    const checkoutBtn = document.getElementById('checkoutBtn');
+    checkoutBtn.disabled = totalQty === 0;
+
+    // Update tombol & in-cart indicators pada kartu produk
+    BOOKS.forEach(book => {
+      const indicator = document.getElementById(`inCart-${book.id}`);
+      if (indicator) indicator.classList.toggle('show', !!cart[book.id]);
+
+      const btn = document.getElementById(`addBtn-${book.id}`);
+      if (btn) {
+        if (cart[book.id]) {
+          btn.textContent = '✓ Dipilih — Batalkan';
+          btn.classList.add('in-cart');
+        } else {
+          btn.textContent = '+ Pilih Buku Ini';
+          btn.classList.remove('in-cart');
+        }
+      }
+    });
+
+    // Mobile bar
+    const mobileCat = document.getElementById('mobileCat');
+    const isMobile = window.innerWidth <= 640;
+    if (isMobile) {
+      mobileCat.style.display = totalQty > 0 ? 'flex' : 'none';
+    }
+    document.getElementById('mobileCartCount').textContent = totalQty + ' buku dipilih';
+    document.getElementById('mobileCartTotal').textContent = formatRupiah(totalPrice);
+  }
+
+  // ==================== CART TOGGLE ====================
+  function toggleCart() {
+    const overlay = document.getElementById('cartOverlay');
+    const sidebar = document.getElementById('cartSidebar');
+    const isOpen = sidebar.classList.contains('open');
+    overlay.classList.toggle('open', !isOpen);
+    sidebar.classList.toggle('open', !isOpen);
+    document.body.style.overflow = isOpen ? '' : 'hidden';
+  }
+
+  // ==================== CHECKOUT ====================
+  function checkout() {
+    const totalQty = getTotalQtyInCart();
+    if (totalQty === 0) return;
+
+    const pricePerUnit = getPricePerUnit(totalQty);
+    const totalPrice = totalQty * pricePerUnit;
+
+    const itemList = Object.keys(cart)
+      .map(id => {
+        const book = BOOKS.find(b => b.id === parseInt(id));
+        return `  • ${book.title} — ${book.author}`;
+      })
+      .join('\n');
+
+    const savingsPerBook = 10000 - pricePerUnit;
+    const totalSavings = savingsPerBook * totalQty;
+    const tierLabel = totalQty <= 2  ? 'Tier 1 (1–2 buku)'
+      : totalQty <= 4  ? 'Tier 2 (3–4 buku)'
+      : totalQty <= 6  ? 'Tier 3 (5–6 buku)'
+      : totalQty <= 8  ? 'Tier 4 (7–8 buku)'
+      : totalQty <= 10 ? 'Tier 5 (9–10 buku)'
+      : 'Tier 6 (>10 buku)';
+
+    const message =
+`Halo Citadel Bookstore! 👋
+
+Saya ingin memesan ebook berikut:
+
+📚 *Daftar Pembelian:*
+${itemList}
+
+📦 *Total:* ${totalQty} buku
+🏷️ *Harga Tier:* ${tierLabel} → ${formatRupiah(pricePerUnit)}/buku${totalSavings > 0 ? `\n🎉 *Hemat:* ${formatRupiah(totalSavings)} (vs harga normal ${formatRupiah(10000)}/buku)` : ''}
+💳 *Total Pembayaran:* *${formatRupiah(totalPrice)}*
+
+Mohon konfirmasi pesanan saya. Terima kasih! 🙏`;
+
+    const encoded = encodeURIComponent(message);
+    window.open(`https://wa.me/${WA_NUMBER}?text=${encoded}`, '_blank');
+  }
+
+  // ==================== TOAST ====================
+  function showToast(msg) {
+    const container = document.getElementById('toastContainer');
+    const toast = document.createElement('div');
+    toast.className = 'toast';
+    toast.textContent = msg;
+    container.appendChild(toast);
+    setTimeout(() => toast.remove(), 2600);
+  }
+
+  // ==================== BOOK POPUP (mobile) ====================
+  let popupBookId = null;
+
+  function onCoverClick(bookId) {
+    if (window.innerWidth > 640) return; // desktop: tidak pakai popup
+    showBookPopup(bookId);
+  }
+
+  function showBookPopup(bookId) {
+    const book = BOOKS.find(b => b.id === bookId);
+    popupBookId = bookId;
+    document.getElementById('popupCover').src = book.cover;
+    document.getElementById('popupCover').alt = book.title;
+    document.getElementById('popupGenre').innerHTML = book.genres.map(g => `<span class="genre-chip">${g}</span>`).join(' ');
+    document.getElementById('popupTitle').textContent = book.title;
+    document.getElementById('popupAuthor').textContent = book.author;
+    document.getElementById('popupDesc').textContent = book.desc;
+    updatePopupBtn();
+    document.getElementById('bookPopupOverlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function updatePopupBtn() {
+    const btn = document.getElementById('popupAddBtn');
+    if (!btn || !popupBookId) return;
+    if (cart[popupBookId]) {
+      btn.textContent = '✓ Dipilih — Batalkan';
+      btn.classList.add('in-cart');
+    } else {
+      btn.textContent = '+ Pilih Buku Ini';
+      btn.classList.remove('in-cart');
+    }
+  }
+
+  function toggleFromPopup() {
+    if (!popupBookId) return;
+    toggleCart_book(popupBookId);
+    updatePopupBtn();
+  }
+
+  function closeBookPopup(e) {
+    if (e && e.target !== document.getElementById('bookPopupOverlay')) return;
+    document.getElementById('bookPopupOverlay').classList.remove('open');
+    document.body.style.overflow = '';
+    popupBookId = null;
+  }
+
+  // ==================== INIT ====================
+  renderFilters();
+  renderProducts();
+  updateUI();
+
+  // Handle mobile bar visibility on resize
+  window.addEventListener('resize', () => {
+    const mobileCat = document.getElementById('mobileCat');
+    const totalQty = getTotalQtyInCart();
+    if (window.innerWidth > 640) {
+      mobileCat.style.display = 'none';
+    } else {
+      mobileCat.style.display = totalQty > 0 ? 'flex' : 'none';
+    }
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,5 @@
+# Photoshop files
+*.psd
+
+# Book metadata (internal use only)
+cover buku/books.txt
