@@ -1436,6 +1436,7 @@
     .order-card-date { font-size: 11px; color: var(--text-sub); margin-bottom: 8px; }
     .order-book-list { list-style: none; margin-bottom: 10px; }
     .order-book-list li {
+      display: flex; align-items: center; justify-content: space-between; gap: 8px;
       font-size: 12px; color: var(--text-main);
       padding: 4px 0;
       border-bottom: 1px solid var(--border);
@@ -1443,6 +1444,17 @@
     }
     .order-book-list li:last-child { border-bottom: none; }
     .order-book-author { color: var(--text-sub); font-style: italic; }
+    .order-book-info { flex: 1; min-width: 0; }
+    .order-book-delete {
+      flex-shrink: 0;
+      background: none; border: none;
+      color: var(--silver-dim);
+      font-size: 16px; line-height: 1;
+      cursor: pointer; padding: 2px 4px;
+      border-radius: 4px;
+      transition: color 0.15s, background 0.15s;
+    }
+    .order-book-delete:hover { color: #e05050; background: rgba(224,80,80,0.1); }
     .order-total {
       font-family: 'Cinzel', serif;
       font-size: 13px; color: var(--gold);
@@ -1899,14 +1911,16 @@
             ? new Date(data.timestamp.seconds * 1000).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })
             : 'Baru saja';
           const bookItems = data.books.map(b =>
-            `<li>${b.title} <span class="order-book-author">— ${b.author}</span></li>`
+            `<li>
+              <span class="order-book-info">${b.title} <span class="order-book-author">— ${b.author}</span></span>
+              <button class="order-book-delete" onclick="deleteBookFromOrder('${doc.id}', ${b.id})" title="Hapus dari daftar">×</button>
+            </li>`
           ).join('');
           return `
             <div class="order-card">
               <div class="order-card-date">${date}</div>
               <ul class="order-book-list">${bookItems}</ul>
               <div class="order-total">${data.totalQty} buku · ${formatRupiah(data.totalPrice)}</div>
-              <button class="order-delete-btn" onclick="deleteOrder('${doc.id}')">🗑 Hapus — Tandai Belum Terbeli</button>
             </div>`;
         }).join('');
       }
@@ -1915,15 +1929,23 @@
     }
   }
 
-  async function deleteOrder(docId) {
+  async function deleteBookFromOrder(docId, bookId) {
     if (!currentUser) return;
     try {
-      await db.collection('orders').doc(currentUser.uid)
-        .collection('purchases').doc(docId).delete();
+      const ref = db.collection('orders').doc(currentUser.uid)
+        .collection('purchases').doc(docId);
+      const snap = await ref.get();
+      if (!snap.exists) return;
+      const newBooks = snap.data().books.filter(b => b.id !== bookId);
+      if (newBooks.length === 0) {
+        await ref.delete();
+      } else {
+        await ref.update({ books: newBooks, totalQty: newBooks.length });
+      }
       await loadPurchasedBooks();
       await fetchAndRenderOrders();
     } catch(e) {
-      showToast('Gagal hapus pesanan.');
+      showToast('Gagal hapus buku.');
     }
   }
 
