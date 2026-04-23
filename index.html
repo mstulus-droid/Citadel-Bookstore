@@ -2453,9 +2453,19 @@ ${itemList}
 
 Mohon konfirmasi pesanan saya. Terima kasih! 🙏`;
 
-    saveOrder();
+    // Buka WA dulu (harus synchronous agar tidak diblokir browser)
     const encoded = encodeURIComponent(message);
     window.open(`https://wa.me/${WA_NUMBER}?text=${encoded}`, '_blank');
+
+    // Simpan order ke Firestore, lalu refresh status beli
+    saveOrder().then(() => loadPurchasedBooks());
+
+    // Bersihkan keranjang & kembali ke halaman utama
+    cart = {};
+    saveCartToStorage();
+    updateUI();
+    closeCart();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   // ==================== TOAST ====================
