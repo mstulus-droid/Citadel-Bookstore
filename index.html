@@ -59,7 +59,7 @@
     /* ========== FLOATING CART BUTTON ========== */
     .cart-float {
       position: fixed;
-      top: 76px;
+      top: 120px;
       right: 16px;
       z-index: 200;
     }
@@ -426,7 +426,7 @@
     /* ========== SEARCH BAR ========== */
     .search-row {
       margin-top: 10px;
-      /* leave room for floating cart button (46px wide + 16px right margin + 8px gap) */
+      padding-left: 70px;
       padding-right: 70px;
     }
     .search-wrap {
@@ -1198,8 +1198,8 @@
       .add-btn { font-size: 10px; padding: 8px 10px; }
       .cover-hover-overlay { display: none !important; }
       .product-footer { justify-content: center; }
-      .pricing-tiers { gap: 6px; }
-      .tier-pill { min-width: 76px; padding: 8px 10px; }
+      .pricing-tiers { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+      .tier-pill { min-width: 0; padding: 8px 10px; }
       .mobile-cart-bar { display: flex; }
       .products-section { padding-bottom: 96px; }
       /* Cover penuh tanpa crop di mobile */
@@ -1214,9 +1214,8 @@
         padding-bottom: 4px;
       }
       .filter-chips::-webkit-scrollbar { display: none; }
-      /* auth float (kiri) dan cart float (kanan) sama-sama butuh clearance */
-      .filter-header { padding-left: 52px; }
-      .search-row { padding-left: 52px; padding-right: 68px; }
+      /* auth float kiri dan cart float kanan — clearance simetris di search row */
+      .search-row { padding-left: 68px; padding-right: 68px; }
     }
 
     @media (max-width: 400px) {
@@ -1242,7 +1241,7 @@
     /* ========== AUTH ========== */
     .auth-float {
       position: fixed;
-      top: 76px;
+      top: 120px;
       left: 16px;
       z-index: 200;
     }
@@ -1523,6 +1522,21 @@
       cursor: default;
       pointer-events: none;
     }
+    .unmark-btn {
+      display: none;
+      width: 100%;
+      margin-top: 6px;
+      background: none;
+      border: 1px dashed rgba(224,80,80,0.35);
+      color: #c06060;
+      font-family: 'Inter', sans-serif;
+      font-size: 11px;
+      padding: 6px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s, color 0.15s;
+    }
+    .unmark-btn:hover { background: rgba(224,80,80,0.1); border-color: #e05050; color: #e05050; }
   </style>
 </head>
 <body>
@@ -2212,6 +2226,7 @@
           <p class="product-desc">${book.desc}</p>
           <div class="product-footer">
             <button class="add-btn" id="addBtn-${book.id}" onclick="toggleCart_book(${book.id})">+ Pilih Buku Ini</button>
+            <button class="unmark-btn" id="unmarkBtn-${book.id}" onclick="unmarkPurchasedById(${book.id})">× Tandai Belum Dibeli</button>
           </div>
         </div>
       </div>`;
@@ -2231,6 +2246,8 @@
         else if (cart[book.id]) { btn.textContent = '✓ Dipilih — Batalkan'; btn.classList.add('in-cart'); }
         else { btn.textContent = '+ Pilih Buku Ini'; btn.classList.remove('in-cart'); }
       }
+      const unmarkBtn = document.getElementById(`unmarkBtn-${book.id}`);
+      if (unmarkBtn) unmarkBtn.style.display = purchasedBookIds.has(book.id) ? 'block' : 'none';
     });
   }
 
@@ -2402,6 +2419,8 @@
           btn.classList.remove('in-cart');
         }
       }
+      const unmarkBtnEl = document.getElementById(`unmarkBtn-${book.id}`);
+      if (unmarkBtnEl) unmarkBtnEl.style.display = purchasedBookIds.has(book.id) ? 'block' : 'none';
     });
 
     // Mobile bar
@@ -2581,16 +2600,16 @@ Mohon konfirmasi pesanan saya. Terima kasih! 🙏`;
     }
   }
 
-  async function unmarkPurchasedFromPopup() {
-    if (!popupBookId || !currentUser) return;
+  async function unmarkBook(bookId) {
+    if (!currentUser) return;
     try {
       const snapshot = await db.collection('orders').doc(currentUser.uid)
         .collection('purchases').get();
       const batch = db.batch();
       snapshot.forEach(doc => {
         const data = doc.data();
-        if (data.books && data.books.some(b => b.id === popupBookId)) {
-          const newBooks = data.books.filter(b => b.id !== popupBookId);
+        if (data.books && data.books.some(b => b.id === bookId)) {
+          const newBooks = data.books.filter(b => b.id !== bookId);
           const ref = db.collection('orders').doc(currentUser.uid)
             .collection('purchases').doc(doc.id);
           newBooks.length === 0 ? batch.delete(ref) : batch.update(ref, { books: newBooks, totalQty: newBooks.length });
@@ -2598,10 +2617,19 @@ Mohon konfirmasi pesanan saya. Terima kasih! 🙏`;
       });
       await batch.commit();
       await loadPurchasedBooks();
-      updatePopupBtn();
     } catch(e) {
       showToast('Gagal mengubah status.');
     }
+  }
+
+  async function unmarkPurchasedById(bookId) {
+    await unmarkBook(bookId);
+  }
+
+  async function unmarkPurchasedFromPopup() {
+    if (!popupBookId || !currentUser) return;
+    await unmarkBook(popupBookId);
+    updatePopupBtn();
   }
 
   function toggleFromPopup() {
