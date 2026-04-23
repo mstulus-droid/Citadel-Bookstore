@@ -1454,6 +1454,49 @@
       color: var(--text-sub);
       font-size: 13px; line-height: 1.7;
     }
+    .order-delete-btn {
+      display: block;
+      width: 100%;
+      margin-top: 10px;
+      background: none;
+      border: 1px dashed rgba(224,80,80,0.35);
+      color: #c06060;
+      font-family: 'Inter', sans-serif;
+      font-size: 11px;
+      padding: 6px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s, color 0.15s;
+    }
+    .order-delete-btn:hover { background: rgba(224,80,80,0.1); border-color: #e05050; color: #e05050; }
+
+    /* Purchased state on product cards */
+    .product-purchased {
+      position: absolute;
+      top: 8px; left: 8px;
+      background: rgba(40,40,40,0.9);
+      color: #999;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      padding: 3px 8px;
+      border-radius: 4px;
+      opacity: 0;
+      transform: scale(0.8);
+      transition: opacity 0.2s, transform 0.2s;
+      pointer-events: none;
+      z-index: 2;
+    }
+    .product-purchased.show { opacity: 1; transform: scale(1); }
+    .product-card.purchased { opacity: 0.45; }
+    .product-card.purchased .product-cover-wrap img { filter: grayscale(80%); }
+    .product-card.purchased .add-btn {
+      background: var(--bg-secondary) !important;
+      color: var(--text-sub) !important;
+      border-color: var(--border) !important;
+      cursor: default;
+      pointer-events: none;
+    }
   </style>
 </head>
 <body>
@@ -1697,6 +1740,7 @@
   auth.onAuthStateChanged(user => {
     currentUser = user;
     updateAuthUI();
+    loadPurchasedBooks();
   });
 
   // Handle redirect result (mobile login)
@@ -1824,13 +1868,25 @@
     }
   }
 
-  async function openOrdersModal() {
-    if (!currentUser) { openAuthModal(null); return; }
-    const overlay = document.getElementById('ordersModalOverlay');
+  async function loadPurchasedBooks() {
+    purchasedBookIds = new Set();
+    if (!currentUser) { renderProducts(); updateUI(); return; }
+    try {
+      const snapshot = await db.collection('orders').doc(currentUser.uid)
+        .collection('purchases').get();
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        if (data.books) data.books.forEach(b => purchasedBookIds.add(b.id));
+      });
+    } catch(e) { console.error('Gagal load purchased:', e); }
+    renderProducts();
+    updateUI();
+  }
+
+  async function fetchAndRenderOrders() {
     const list = document.getElementById('ordersModalList');
+    if (!list) return;
     list.innerHTML = `<div class="orders-empty">Memuat pesanan...</div>`;
-    overlay.classList.add('open');
-    document.body.style.overflow = 'hidden';
     try {
       const snapshot = await db.collection('orders').doc(currentUser.uid)
         .collection('purchases').orderBy('timestamp', 'desc').limit(30).get();
@@ -1850,12 +1906,32 @@
               <div class="order-card-date">${date}</div>
               <ul class="order-book-list">${bookItems}</ul>
               <div class="order-total">${data.totalQty} buku · ${formatRupiah(data.totalPrice)}</div>
+              <button class="order-delete-btn" onclick="deleteOrder('${doc.id}')">🗑 Hapus — Tandai Belum Terbeli</button>
             </div>`;
         }).join('');
       }
     } catch (e) {
       list.innerHTML = `<div class="orders-empty">Gagal memuat pesanan.</div>`;
     }
+  }
+
+  async function deleteOrder(docId) {
+    if (!currentUser) return;
+    try {
+      await db.collection('orders').doc(currentUser.uid)
+        .collection('purchases').doc(docId).delete();
+      await loadPurchasedBooks();
+      await fetchAndRenderOrders();
+    } catch(e) {
+      showToast('Gagal hapus pesanan.');
+    }
+  }
+
+  async function openOrdersModal() {
+    if (!currentUser) { openAuthModal(null); return; }
+    document.getElementById('ordersModalOverlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+    await fetchAndRenderOrders();
   }
 
   function closeOrdersModal() {
@@ -1972,6 +2048,7 @@
   // ==================== STATE ====================
   let cart = {};            // { bookId: 1 }
   let activeFilters = new Set(); // set of genre strings
+  let purchasedBookIds = new Set(); // IDs buku yang sudah dibeli
 
   function saveCartToStorage() {
     localStorage.setItem('citadel_cart', JSON.stringify(Object.keys(cart).map(Number)));
@@ -2087,6 +2164,7 @@
         <div class="product-cover-wrap" onclick="onCoverClick(${book.id})" style="cursor:pointer">
           <img src="${safeCover}" alt="${escAttr(book.title)}" loading="lazy">
           <span class="product-in-cart" id="inCart-${book.id}">✓ Di Keranjang</span>
+          <span class="product-purchased" id="purchased-${book.id}">✓ Sudah Dibeli</span>
           <div class="cover-hover-overlay">
             <div class="overlay-title">${book.title}</div>
             <div class="overlay-author">${book.author}</div>
@@ -2109,9 +2187,14 @@
     visible.forEach(book => {
       const indicator = document.getElementById(`inCart-${book.id}`);
       if (indicator) indicator.classList.toggle('show', !!cart[book.id]);
+      const pBadge = document.getElementById(`purchased-${book.id}`);
+      if (pBadge) pBadge.classList.toggle('show', purchasedBookIds.has(book.id));
+      const card = document.getElementById(`card-${book.id}`);
+      if (card) card.classList.toggle('purchased', purchasedBookIds.has(book.id));
       const btn = document.getElementById(`addBtn-${book.id}`);
       if (btn) {
-        if (cart[book.id]) { btn.textContent = '✓ Dipilih — Batalkan'; btn.classList.add('in-cart'); }
+        if (purchasedBookIds.has(book.id)) { btn.textContent = '✓ Sudah Dibeli'; btn.classList.remove('in-cart'); }
+        else if (cart[book.id]) { btn.textContent = '✓ Dipilih — Batalkan'; btn.classList.add('in-cart'); }
         else { btn.textContent = '+ Pilih Buku Ini'; btn.classList.remove('in-cart'); }
       }
     });
@@ -2267,11 +2350,17 @@
     // Update tombol & in-cart indicators pada kartu produk
     BOOKS.forEach(book => {
       const indicator = document.getElementById(`inCart-${book.id}`);
-      if (indicator) indicator.classList.toggle('show', !!cart[book.id]);
-
+      if (indicator) indicator.classList.toggle('show', !!cart[book.id] && !purchasedBookIds.has(book.id));
+      const pBadge = document.getElementById(`purchased-${book.id}`);
+      if (pBadge) pBadge.classList.toggle('show', purchasedBookIds.has(book.id));
+      const card = document.getElementById(`card-${book.id}`);
+      if (card) card.classList.toggle('purchased', purchasedBookIds.has(book.id));
       const btn = document.getElementById(`addBtn-${book.id}`);
       if (btn) {
-        if (cart[book.id]) {
+        if (purchasedBookIds.has(book.id)) {
+          btn.textContent = '✓ Sudah Dibeli';
+          btn.classList.remove('in-cart');
+        } else if (cart[book.id]) {
           btn.textContent = '✓ Dipilih — Batalkan';
           btn.classList.add('in-cart');
         } else {
