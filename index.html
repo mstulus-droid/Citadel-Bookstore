@@ -1699,22 +1699,47 @@
     updateAuthUI();
   });
 
+  // Handle redirect result (mobile login)
+  auth.getRedirectResult().then(result => {
+    if (result && result.user) {
+      currentUser = result.user;
+      updateAuthUI();
+      closeAuthModal();
+      const savedId = sessionStorage.getItem('pendingBookId');
+      if (savedId) {
+        sessionStorage.removeItem('pendingBookId');
+        toggleCart_book(parseInt(savedId));
+      }
+    }
+  }).catch(err => {
+    if (err.code !== 'auth/no-current-user') console.error(err);
+  });
+
   function signInWithGoogle() {
-    auth.signInWithPopup(googleProvider)
-      .then(result => {
-        currentUser = result.user;
-        updateAuthUI();
-        closeAuthModal();
-        if (pendingBookId !== null) {
-          const id = pendingBookId;
-          pendingBookId = null;
-          toggleCart_book(id);
-        }
-      })
-      .catch(err => {
+    const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || window.innerWidth <= 768;
+    if (isMobile) {
+      if (pendingBookId !== null) sessionStorage.setItem('pendingBookId', pendingBookId);
+      auth.signInWithRedirect(googleProvider).catch(err => {
         console.error(err);
         showToast('Login gagal. Coba lagi.');
       });
+    } else {
+      auth.signInWithPopup(googleProvider)
+        .then(result => {
+          currentUser = result.user;
+          updateAuthUI();
+          closeAuthModal();
+          if (pendingBookId !== null) {
+            const id = pendingBookId;
+            pendingBookId = null;
+            toggleCart_book(id);
+          }
+        })
+        .catch(err => {
+          console.error(err);
+          showToast('Login gagal. Coba lagi.');
+        });
+    }
   }
 
   function signOutUser() {
@@ -1948,6 +1973,20 @@
   let cart = {};            // { bookId: 1 }
   let activeFilters = new Set(); // set of genre strings
 
+  function saveCartToStorage() {
+    localStorage.setItem('citadel_cart', JSON.stringify(Object.keys(cart).map(Number)));
+  }
+
+  function loadCartFromStorage() {
+    try {
+      const saved = localStorage.getItem('citadel_cart');
+      if (saved) {
+        const ids = JSON.parse(saved);
+        ids.forEach(id => { cart[id] = 1; });
+      }
+    } catch(e) {}
+  }
+
   // ==================== PRICING ====================
   function getPricePerUnit(totalQty) {
     if (totalQty <= 2)  return 10000;
@@ -2145,11 +2184,13 @@
       animateAddToCart(bookId);
       showToast(`${book.title} ditambahkan ✓`, bookId);
     }
+    saveCartToStorage();
     updateUI();
   }
 
   function removeFromCart(bookId) {
     delete cart[bookId];
+    saveCartToStorage();
     updateUI();
   }
 
@@ -2417,6 +2458,7 @@ Mohon konfirmasi pesanan saya. Terima kasih! 🙏`;
   }
 
   // ==================== INIT ====================
+  loadCartFromStorage();
   renderFilters();
   renderProducts();
   updateUI();
