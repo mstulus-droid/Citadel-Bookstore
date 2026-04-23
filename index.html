@@ -4,8 +4,16 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Citadel Bookstore — Teman Baca Anda</title>
+  <link rel="icon" type="image/png" href="logo/favicon/favicon-96x96.png" sizes="96x96" />
+  <link rel="icon" type="image/svg+xml" href="logo/favicon/favicon.svg" />
+  <link rel="shortcut icon" href="logo/favicon/favicon.ico" />
+  <link rel="apple-touch-icon" sizes="180x180" href="logo/favicon/apple-touch-icon.png" />
+  <link rel="manifest" href="logo/favicon/site.webmanifest" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Cinzel+Decorative:wght@400;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -51,7 +59,7 @@
     /* ========== FLOATING CART BUTTON ========== */
     .cart-float {
       position: fixed;
-      top: 16px;
+      top: 76px;
       right: 16px;
       z-index: 200;
     }
@@ -368,7 +376,7 @@
     }
     .product-in-cart.show { opacity: 1; transform: translateY(0); }
 
-    .product-body { padding: 18px 18px 20px; flex: 1; display: flex; flex-direction: column; }
+    .product-body { padding: 18px 18px 20px; flex: 1; display: flex; flex-direction: column; text-align: center; }
 
     /* ========== CATEGORY FILTER ========== */
     .filter-section {
@@ -494,6 +502,7 @@
       flex-wrap: wrap;
       gap: 4px;
       margin-bottom: 7px;
+      justify-content: center;
     }
 
     .genre-chip {
@@ -531,9 +540,56 @@
       line-height: 1.65;
       flex: 1;
       margin-bottom: 16px;
+      display: none;
     }
 
-    .product-footer { display: flex; align-items: center; }
+    /* ========== COVER HOVER OVERLAY (desktop) ========== */
+    .cover-hover-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(12, 12, 15, 0.94);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      padding: 16px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+      z-index: 4;
+      gap: 4px;
+    }
+    .product-cover-wrap:hover .cover-hover-overlay {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .cover-hover-overlay .overlay-title {
+      font-family: 'Cinzel', serif;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-main);
+      line-height: 1.3;
+      text-align: center;
+    }
+    .cover-hover-overlay .overlay-author {
+      font-size: 11px;
+      color: var(--gold-dim);
+      font-style: italic;
+      margin-bottom: 4px;
+      text-align: center;
+    }
+    .cover-hover-overlay .overlay-desc {
+      font-size: 11.5px;
+      color: var(--silver);
+      line-height: 1.6;
+      overflow-y: auto;
+      flex: 1;
+      margin-bottom: 8px;
+    }
+    .cover-hover-overlay .overlay-desc::-webkit-scrollbar { width: 3px; }
+    .cover-hover-overlay .overlay-desc::-webkit-scrollbar-thumb { background: var(--gold-dim); border-radius: 2px; }
+    .product-footer { display: flex; align-items: center; margin-top: auto; }
 
     .add-btn {
       width: 100%;
@@ -863,12 +919,12 @@
     }
 
     @keyframes toastIn {
-      from { opacity: 0; transform: translateY(8px); }
-      to { opacity: 1; transform: translateY(0); }
+      from { opacity: 0; margin-top: 8px; }
+      to { opacity: 1; margin-top: 0; }
     }
     @keyframes toastOut {
-      from { opacity: 1; transform: translateY(0); }
-      to { opacity: 0; transform: translateY(-8px); }
+      from { opacity: 1; margin-top: 0; }
+      to { opacity: 0; margin-top: -8px; }
     }
 
     /* ========== FOOTER ========== */
@@ -1124,11 +1180,10 @@
     @media (max-width: 640px) {
       .cart-float { top: 72px; right: 14px; }
       .product-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
-      .product-body { padding: 12px 12px 14px; text-align: center; }
-      .product-genres { justify-content: center; }
+      .product-body { padding: 12px 12px 14px; }
       .product-title { font-size: 12px; }
-      .product-desc { display: none; }
       .add-btn { font-size: 10px; padding: 8px 10px; }
+      .cover-hover-overlay { display: none !important; }
       .product-footer { justify-content: center; }
       .pricing-tiers { gap: 6px; }
       .tier-pill { min-width: 76px; padding: 8px 10px; }
@@ -1154,6 +1209,10 @@
       .product-grid { grid-template-columns: 1fr; }
     }
 
+    @media (min-width: 641px) {
+      .cover-hover-overlay { display: flex; }
+    }
+
     @media (min-width: 641px) and (max-width: 900px) {
       .product-grid { grid-template-columns: repeat(2, 1fr); }
     }
@@ -1165,9 +1224,242 @@
     @media (min-width: 1200px) {
       .product-grid { grid-template-columns: repeat(5, 1fr); }
     }
+
+    /* ========== AUTH ========== */
+    .auth-float {
+      position: fixed;
+      top: 76px;
+      left: 16px;
+      z-index: 200;
+    }
+    @media (max-width: 640px) {
+      .auth-float { top: 72px; left: 14px; }
+    }
+    .auth-float-btn {
+      background: rgba(12, 12, 15, 0.82);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--border-strong);
+      color: var(--gold);
+      cursor: pointer;
+      width: 46px;
+      height: 46px;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s, border-color 0.2s;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+    }
+    .auth-float-btn:hover { background: rgba(12,12,15,0.95); border-color: var(--gold); }
+    .auth-avatar-float {
+      width: 46px; height: 46px;
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+      cursor: pointer;
+      border: 1px solid var(--border-strong);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+      background: var(--bg-card);
+      display: flex; align-items: center; justify-content: center;
+      transition: border-color 0.2s;
+    }
+    .auth-avatar-float:hover { border-color: var(--gold); }
+    .auth-avatar-float img { width: 100%; height: 100%; object-fit: cover; }
+    .auth-avatar-initial {
+      font-family: 'Cinzel', serif;
+      font-size: 18px; font-weight: 700;
+      color: var(--gold);
+    }
+    .auth-section { margin-top: 16px; }
+    .login-hero-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: transparent;
+      border: 1px solid var(--border-strong);
+      color: var(--text-main);
+      font-family: 'Inter', sans-serif;
+      font-size: 13px; font-weight: 500;
+      padding: 9px 20px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: background 0.2s, border-color 0.2s, color 0.2s;
+    }
+    .login-hero-btn:hover { background: var(--gold-glow); border-color: var(--gold); color: var(--gold); }
+    .hero-user-name {
+      font-family: 'Cinzel', serif;
+      font-size: 14px; font-weight: 600;
+      color: var(--text-main);
+      margin-bottom: 2px;
+    }
+    .hero-user-email { font-size: 12px; color: var(--text-sub); margin-bottom: 12px; }
+    .hero-user-actions { display: flex; align-items: center; gap: 8px; justify-content: center; }
+    .my-books-btn {
+      background: transparent;
+      border: 1px solid var(--border-strong);
+      color: var(--gold);
+      font-family: 'Cinzel', serif;
+      font-size: 11px; font-weight: 600;
+      letter-spacing: 0.5px;
+      padding: 7px 16px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .my-books-btn:hover { background: var(--gold-glow); border-color: var(--gold); }
+    .logout-btn {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--silver-dim);
+      font-family: 'Inter', sans-serif;
+      font-size: 11px;
+      padding: 7px 14px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: color 0.15s, border-color 0.15s;
+    }
+    .logout-btn:hover { color: #e05050; border-color: #e05050; }
+
+    /* Auth required modal */
+    .auth-modal-overlay {
+      position: fixed; inset: 0; z-index: 700;
+      background: rgba(0,0,0,0.78);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      display: flex; align-items: center; justify-content: center;
+      padding: 20px 16px;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.2s;
+    }
+    .auth-modal-overlay.open { opacity: 1; pointer-events: all; }
+    .auth-modal {
+      background: var(--bg-card);
+      border: 1px solid var(--border-strong);
+      border-radius: 18px;
+      width: 100%; max-width: 360px;
+      padding: 32px 28px 28px;
+      box-shadow: var(--shadow);
+      transform: scale(0.9) translateY(10px);
+      opacity: 0;
+      transition: transform 0.25s cubic-bezier(0.34,1.4,0.64,1), opacity 0.2s;
+      text-align: center;
+    }
+    .auth-modal-overlay.open .auth-modal { transform: scale(1) translateY(0); opacity: 1; }
+    .auth-modal-icon { font-size: 36px; margin-bottom: 12px; }
+    .auth-modal-title {
+      font-family: 'Cinzel', serif;
+      font-size: 16px; font-weight: 700;
+      color: var(--gold); margin-bottom: 8px;
+    }
+    .auth-modal-sub {
+      font-size: 13px; color: var(--text-sub);
+      line-height: 1.65; margin-bottom: 24px;
+    }
+    .google-login-btn {
+      width: 100%;
+      display: flex; align-items: center; justify-content: center;
+      gap: 10px;
+      background: #fff;
+      border: none;
+      color: #1f1f1f;
+      font-family: 'Inter', sans-serif;
+      font-size: 14px; font-weight: 600;
+      padding: 13px 20px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: filter 0.2s, transform 0.15s;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    }
+    .google-login-btn:hover { filter: brightness(0.97); transform: translateY(-1px); }
+    .google-login-btn:active { transform: scale(0.99); }
+    .auth-modal-skip {
+      display: block;
+      margin: 12px auto 0;
+      font-size: 12px; color: var(--silver-dim);
+      cursor: pointer;
+      background: none; border: none;
+      font-family: 'Inter', sans-serif;
+      text-decoration: underline;
+    }
+    .auth-modal-skip:hover { color: var(--text-sub); }
+
+    /* Orders modal */
+    .orders-modal-overlay {
+      position: fixed; inset: 0; z-index: 700;
+      background: rgba(0,0,0,0.78);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      display: flex; align-items: center; justify-content: center;
+      padding: 20px 16px;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.2s;
+    }
+    .orders-modal-overlay.open { opacity: 1; pointer-events: all; }
+    .orders-modal {
+      background: var(--bg-card);
+      border: 1px solid var(--border-strong);
+      border-radius: 18px;
+      width: 100%; max-width: 460px;
+      max-height: 80vh;
+      overflow-y: auto;
+      padding: 24px 20px;
+      box-shadow: var(--shadow);
+      transform: scale(0.9) translateY(10px);
+      opacity: 0;
+      transition: transform 0.25s cubic-bezier(0.34,1.4,0.64,1), opacity 0.2s;
+    }
+    .orders-modal-overlay.open .orders-modal { transform: scale(1) translateY(0); opacity: 1; }
+    .orders-modal-header {
+      display: flex; align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    .orders-modal-title {
+      font-family: 'Cinzel', serif;
+      font-size: 15px; font-weight: 700;
+      color: var(--gold);
+    }
+    .orders-modal-close {
+      background: none; border: none;
+      color: var(--text-sub); font-size: 22px;
+      cursor: pointer; line-height: 1;
+      transition: color 0.15s;
+    }
+    .orders-modal-close:hover { color: var(--text-main); }
+    .order-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px 16px;
+      margin-bottom: 12px;
+    }
+    .order-card-date { font-size: 11px; color: var(--text-sub); margin-bottom: 8px; }
+    .order-book-list { list-style: none; margin-bottom: 10px; }
+    .order-book-list li {
+      font-size: 12px; color: var(--text-main);
+      padding: 4px 0;
+      border-bottom: 1px solid var(--border);
+      line-height: 1.4;
+    }
+    .order-book-list li:last-child { border-bottom: none; }
+    .order-book-author { color: var(--text-sub); font-style: italic; }
+    .order-total {
+      font-family: 'Cinzel', serif;
+      font-size: 13px; color: var(--gold);
+      text-align: right; margin-top: 8px;
+    }
+    .orders-empty {
+      text-align: center;
+      padding: 32px 16px;
+      color: var(--text-sub);
+      font-size: 13px; line-height: 1.7;
+    }
   </style>
 </head>
 <body>
+
+<!-- AUTH FLOAT -->
+<div class="auth-float" id="authFloat"></div>
 
 <!-- FLOATING CART -->
 <div class="cart-float">
@@ -1188,6 +1480,7 @@
     <p style="font-size:12px;color:var(--text-sub);margin-top:-20px;margin-bottom:28px">
       <a href="https://rhadzor.id" target="_blank" rel="noopener" style="color:var(--gold-dim);text-decoration:none;transition:color 0.15s" onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='var(--gold-dim)'">Powered by Rhadzor.ID</a>
     </p>
+    <div id="heroAuth" class="auth-section"></div>
   </div>
 </section>
 
@@ -1277,6 +1570,31 @@
   </div>
 </div>
 
+<!-- AUTH MODAL -->
+<div class="auth-modal-overlay" id="authModalOverlay" onclick="onAuthOverlayClick(event)">
+  <div class="auth-modal" id="authModal">
+    <div class="auth-modal-icon">🔐</div>
+    <p class="auth-modal-title" id="authModalTitle">Masuk ke Citadel</p>
+    <p class="auth-modal-sub" id="authModalSub">Masuk untuk menyimpan riwayat pesanan dan memudahkan pengiriman ebook via email.</p>
+    <button class="google-login-btn" onclick="signInWithGoogle()">
+      <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.08 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.29-8.16 2.29-6.26 0-11.57-3.59-13.46-8.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+      Masuk dengan Google
+    </button>
+    <button class="auth-modal-skip" id="authSkipBtn" onclick="closeAuthModal()">Lewati untuk sekarang</button>
+  </div>
+</div>
+
+<!-- ORDERS MODAL -->
+<div class="orders-modal-overlay" id="ordersModalOverlay" onclick="onOrdersOverlayClick(event)">
+  <div class="orders-modal" id="ordersModal">
+    <div class="orders-modal-header">
+      <span class="orders-modal-title">📖 Pesanan Saya</span>
+      <button class="orders-modal-close" onclick="closeOrdersModal()">×</button>
+    </div>
+    <div id="ordersModalList"></div>
+  </div>
+</div>
+
 <!-- FOOTER -->
 <footer class="footer">
   <p class="footer-text" style="font-size:11px;">© 2026 Citadel Bookstore.</p>
@@ -1358,6 +1676,172 @@
 <div class="toast-container" id="toastContainer"></div>
 
 <script>
+  // ==================== FIREBASE ====================
+  // PENTING: Ganti konfigurasi di bawah dengan Firebase project kamu
+  // Cara: Firebase Console → Project Settings → General → Your Apps → SDK setup and configuration
+  firebase.initializeApp({
+    apiKey:            "AIzaSyBCsTHHYA2u5ouuFUPZks1Z6J3a5hbWQgI",
+    authDomain:        "citadel-97052.firebaseapp.com",
+    projectId:         "citadel-97052",
+    storageBucket:     "citadel-97052.firebasestorage.app",
+    messagingSenderId: "270161738341",
+    appId:             "1:270161738341:web:ac2a6fbbbcf7e1deeda48c"
+  });
+  const auth = firebase.auth();
+  const db = firebase.firestore();
+  const googleProvider = new firebase.auth.GoogleAuthProvider();
+
+  let currentUser = null;
+  let pendingBookId = null;
+
+  auth.onAuthStateChanged(user => {
+    currentUser = user;
+    updateAuthUI();
+  });
+
+  function signInWithGoogle() {
+    auth.signInWithPopup(googleProvider)
+      .then(result => {
+        currentUser = result.user;
+        updateAuthUI();
+        closeAuthModal();
+        if (pendingBookId !== null) {
+          const id = pendingBookId;
+          pendingBookId = null;
+          toggleCart_book(id);
+        }
+      })
+      .catch(err => {
+        console.error(err);
+        showToast('Login gagal. Coba lagi.');
+      });
+  }
+
+  function signOutUser() {
+    auth.signOut().then(() => {
+      cart = {};
+      updateUI();
+      showToast('Berhasil keluar');
+    });
+  }
+
+  function updateAuthUI() {
+    const floatEl = document.getElementById('authFloat');
+    const heroAuthEl = document.getElementById('heroAuth');
+    if (!floatEl || !heroAuthEl) return;
+    if (currentUser) {
+      const avatarHTML = currentUser.photoURL
+        ? `<img src="${currentUser.photoURL}" alt="Profil">`
+        : `<span class="auth-avatar-initial">${(currentUser.displayName || 'U')[0].toUpperCase()}</span>`;
+      floatEl.innerHTML = `<button class="auth-avatar-float" onclick="openOrdersModal()" title="Pesanan Saya">${avatarHTML}</button>`;
+      const firstName = currentUser.displayName ? currentUser.displayName.split(' ')[0] : 'Pembaca';
+      heroAuthEl.innerHTML = `
+        <div class="hero-user-name">Halo, ${firstName}!</div>
+        <div class="hero-user-email">${currentUser.email}</div>
+        <div class="hero-user-actions">
+          <button class="my-books-btn" onclick="openOrdersModal()">📖 Pesanan Saya</button>
+          <button class="logout-btn" onclick="signOutUser()">Keluar</button>
+        </div>`;
+    } else {
+      floatEl.innerHTML = `
+        <button class="auth-float-btn" onclick="openAuthModal(null)" title="Masuk">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </button>`;
+      heroAuthEl.innerHTML = `
+        <button class="login-hero-btn" onclick="openAuthModal(null)">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          Masuk dengan Google
+        </button>`;
+    }
+  }
+
+  function openAuthModal(bookId) {
+    pendingBookId = bookId;
+    const isRequired = bookId !== null;
+    document.getElementById('authModalTitle').textContent = isRequired ? 'Login Diperlukan' : 'Masuk ke Citadel';
+    document.getElementById('authModalSub').textContent = isRequired
+      ? 'Masuk dulu untuk menambahkan buku ke keranjang. Email kamu digunakan untuk pengiriman ebook via Gmail.'
+      : 'Masuk untuk menyimpan riwayat pesanan dan memudahkan pengiriman ebook via email.';
+    document.getElementById('authSkipBtn').style.display = isRequired ? 'none' : 'block';
+    document.getElementById('authModalOverlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeAuthModal() {
+    document.getElementById('authModalOverlay').classList.remove('open');
+    document.body.style.overflow = '';
+    if (!currentUser) pendingBookId = null;
+  }
+
+  function onAuthOverlayClick(e) {
+    if (e.target === document.getElementById('authModalOverlay')) closeAuthModal();
+  }
+
+  async function saveOrder() {
+    if (!currentUser) return;
+    const totalQty = getTotalQtyInCart();
+    const pricePerUnit = getPricePerUnit(totalQty);
+    const books = Object.keys(cart).map(id => {
+      const book = BOOKS.find(b => b.id === parseInt(id));
+      return { id: parseInt(id), title: book.title, author: book.author };
+    });
+    try {
+      await db.collection('orders').doc(currentUser.uid).collection('purchases').add({
+        books,
+        totalQty,
+        pricePerUnit,
+        totalPrice: totalQty * pricePerUnit,
+        email: currentUser.email,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+      });
+    } catch (e) {
+      console.error('Gagal menyimpan pesanan:', e);
+    }
+  }
+
+  async function openOrdersModal() {
+    if (!currentUser) { openAuthModal(null); return; }
+    const overlay = document.getElementById('ordersModalOverlay');
+    const list = document.getElementById('ordersModalList');
+    list.innerHTML = `<div class="orders-empty">Memuat pesanan...</div>`;
+    overlay.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    try {
+      const snapshot = await db.collection('orders').doc(currentUser.uid)
+        .collection('purchases').orderBy('timestamp', 'desc').limit(30).get();
+      if (snapshot.empty) {
+        list.innerHTML = `<div class="orders-empty">Belum ada pesanan.<br>Mulai pilih ebook favoritmu!</div>`;
+      } else {
+        list.innerHTML = snapshot.docs.map(doc => {
+          const data = doc.data();
+          const date = data.timestamp
+            ? new Date(data.timestamp.seconds * 1000).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })
+            : 'Baru saja';
+          const bookItems = data.books.map(b =>
+            `<li>${b.title} <span class="order-book-author">— ${b.author}</span></li>`
+          ).join('');
+          return `
+            <div class="order-card">
+              <div class="order-card-date">${date}</div>
+              <ul class="order-book-list">${bookItems}</ul>
+              <div class="order-total">${data.totalQty} buku · ${formatRupiah(data.totalPrice)}</div>
+            </div>`;
+        }).join('');
+      }
+    } catch (e) {
+      list.innerHTML = `<div class="orders-empty">Gagal memuat pesanan.</div>`;
+    }
+  }
+
+  function closeOrdersModal() {
+    document.getElementById('ordersModalOverlay').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  function onOrdersOverlayClick(e) {
+    if (e.target === document.getElementById('ordersModalOverlay')) closeOrdersModal();
+  }
+
   // ==================== DATA ====================
   const BOOKS = [
     { id:1,  title:"1984", author:"George Orwell", cover:"cover buku/1984 by George Orwell.png", genres:["Fiction","Dystopian"], desc:"Visi gelap tentang negara pengawas totaliter yang mengontrol pikiran dan realitas melalui propaganda dan kebohongan sistematis." },
@@ -1519,6 +2003,10 @@
     searchQuery = val;
     document.getElementById('searchClear').style.display = val ? 'block' : 'none';
     renderProducts();
+    const section = document.querySelector('.filter-section');
+    if (section) {
+      window.scrollTo({ top: section.offsetTop, behavior: 'smooth' });
+    }
   }
 
   function clearSearch() {
@@ -1526,6 +2014,10 @@
     document.getElementById('searchInput').value = '';
     document.getElementById('searchClear').style.display = 'none';
     renderProducts();
+    const section = document.querySelector('.filter-section');
+    if (section) {
+      window.scrollTo({ top: section.offsetTop, behavior: 'smooth' });
+    }
   }
 
   function getFilteredBooks() {
@@ -1556,6 +2048,11 @@
         <div class="product-cover-wrap" onclick="onCoverClick(${book.id})" style="cursor:pointer">
           <img src="${safeCover}" alt="${escAttr(book.title)}" loading="lazy">
           <span class="product-in-cart" id="inCart-${book.id}">✓ Di Keranjang</span>
+          <div class="cover-hover-overlay">
+            <div class="overlay-title">${book.title}</div>
+            <div class="overlay-author">${book.author}</div>
+            <div class="overlay-desc">${book.desc}</div>
+          </div>
         </div>
         <div class="product-body">
           <div class="product-genres">${genreChips}</div>
@@ -1635,14 +2132,18 @@
 
   // ==================== CART OPERATIONS ====================
   function toggleCart_book(bookId) {
+    if (!currentUser && !cart[bookId]) {
+      openAuthModal(bookId);
+      return;
+    }
     const book = BOOKS.find(b => b.id === bookId);
     if (cart[bookId]) {
       delete cart[bookId];
-      showToast(`${book.title} dihapus dari pilihan`);
+      showToast(`${book.title} dihapus dari pilihan`, bookId);
     } else {
       cart[bookId] = 1;
       animateAddToCart(bookId);
-      showToast(`${book.title} ditambahkan ✓`);
+      showToast(`${book.title} ditambahkan ✓`, bookId);
     }
     updateUI();
   }
@@ -1806,6 +2307,8 @@
       : totalQty <= 10 ? 'Tier 5 (9–10 buku)'
       : 'Tier 6 (>10 buku)';
 
+    const emailLine = currentUser ? `\n📧 *Email Penerima:* ${currentUser.email}` : '';
+
     const message =
 `Halo Citadel Bookstore! 👋
 
@@ -1816,16 +2319,40 @@ ${itemList}
 
 📦 *Total:* ${totalQty} buku
 🏷️ *Harga Tier:* ${tierLabel} → ${formatRupiah(pricePerUnit)}/buku${totalSavings > 0 ? `\n🎉 *Hemat:* ${formatRupiah(totalSavings)} (vs harga normal ${formatRupiah(10000)}/buku)` : ''}
-💳 *Total Pembayaran:* *${formatRupiah(totalPrice)}*
+💳 *Total Pembayaran:* *${formatRupiah(totalPrice)}*${emailLine}
 
 Mohon konfirmasi pesanan saya. Terima kasih! 🙏`;
 
+    saveOrder();
     const encoded = encodeURIComponent(message);
     window.open(`https://wa.me/${WA_NUMBER}?text=${encoded}`, '_blank');
   }
 
   // ==================== TOAST ====================
-  function showToast(msg) {
+  function showToast(msg, bookId) {
+    if (bookId) {
+      const card = document.getElementById(`card-${bookId}`);
+      if (card) {
+        const rect = card.getBoundingClientRect();
+        const wrapper = document.createElement('div');
+        wrapper.style.position = 'fixed';
+        wrapper.style.left = (rect.left + rect.width / 2) + 'px';
+        wrapper.style.top = (rect.top + rect.height / 2 - 20) + 'px';
+        wrapper.style.transform = 'translate(-50%, -50%)';
+        wrapper.style.zIndex = '500';
+        wrapper.style.pointerEvents = 'none';
+
+        const toast = document.createElement('div');
+        toast.className = 'toast';
+        toast.textContent = msg;
+
+        wrapper.appendChild(toast);
+        document.body.appendChild(wrapper);
+        setTimeout(() => wrapper.remove(), 2600);
+        return;
+      }
+    }
+
     const container = document.getElementById('toastContainer');
     const toast = document.createElement('div');
     toast.className = 'toast';
