@@ -1174,7 +1174,20 @@
       line-height: 1.65;
     }
 
-    .popup-btn-wrap { margin-top: 18px; }
+    .popup-btn-wrap { margin-top: 18px; display: flex; flex-direction: column; gap: 8px; }
+    .popup-unmark-btn {
+      width: 100%;
+      background: none;
+      border: 1px dashed rgba(224,80,80,0.4);
+      color: #c06060;
+      font-family: 'Inter', sans-serif;
+      font-size: 12px;
+      padding: 9px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s, color 0.15s;
+    }
+    .popup-unmark-btn:hover { background: rgba(224,80,80,0.1); border-color: #e05050; color: #e05050; }
 
     /* ========== RESPONSIVE ========== */
     @media (max-width: 640px) {
@@ -1201,8 +1214,9 @@
         padding-bottom: 4px;
       }
       .filter-chips::-webkit-scrollbar { display: none; }
-      /* on mobile cart is at top:72px right:14px — give same right clearance */
-      .search-row { padding-right: 68px; }
+      /* auth float (kiri) dan cart float (kanan) sama-sama butuh clearance */
+      .filter-header { padding-left: 52px; }
+      .search-row { padding-left: 52px; padding-right: 68px; }
     }
 
     @media (max-width: 400px) {
@@ -1643,7 +1657,7 @@
 <div class="orders-modal-overlay" id="ordersModalOverlay" onclick="onOrdersOverlayClick(event)">
   <div class="orders-modal" id="ordersModal">
     <div class="orders-modal-header">
-      <span class="orders-modal-title">📖 Pesanan Saya</span>
+      <span class="orders-modal-title">Riwayat Pesanan Saya</span>
       <button class="orders-modal-close" onclick="closeOrdersModal()">×</button>
     </div>
     <div id="ordersModalList"></div>
@@ -1723,6 +1737,7 @@
     </div>
     <div class="popup-btn-wrap">
       <button class="add-btn" id="popupAddBtn" onclick="toggleFromPopup()"></button>
+      <button class="popup-unmark-btn" id="popupUnmarkBtn" onclick="unmarkPurchasedFromPopup()" style="display:none">× Tandai Belum Dibeli</button>
     </div>
   </div>
 </div>
@@ -1819,10 +1834,7 @@
       heroAuthEl.innerHTML = `
         <div class="hero-user-name">Halo, ${firstName}!</div>
         <div class="hero-user-email">${currentUser.email}</div>
-        <div class="hero-user-actions">
-          <button class="my-books-btn" onclick="openOrdersModal()">📖 Pesanan Saya</button>
-          <button class="logout-btn" onclick="signOutUser()">Keluar</button>
-        </div>`;
+        <button class="logout-btn" style="display:block;margin:8px auto 0" onclick="signOutUser()">Keluar</button>`;
     } else {
       floatEl.innerHTML = `
         <button class="auth-float-btn" onclick="openAuthModal(null)" title="Masuk">
@@ -2164,7 +2176,7 @@
       const matchCat = activeFilters.size === 0 || b.genres.some(g => activeFilters.has(g));
       const matchSearch = !q || b.title.toLowerCase().includes(q) || b.author.toLowerCase().includes(q);
       return matchCat && matchSearch;
-    });
+    }).sort((a, b) => (purchasedBookIds.has(a.id) ? 1 : 0) - (purchasedBookIds.has(b.id) ? 1 : 0));
   }
 
   // ==================== RENDER PRODUCTS ====================
@@ -2547,13 +2559,48 @@ Mohon konfirmasi pesanan saya. Terima kasih! 🙏`;
 
   function updatePopupBtn() {
     const btn = document.getElementById('popupAddBtn');
+    const unmarkBtn = document.getElementById('popupUnmarkBtn');
     if (!btn || !popupBookId) return;
-    if (cart[popupBookId]) {
-      btn.textContent = '✓ Dipilih — Batalkan';
-      btn.classList.add('in-cart');
-    } else {
-      btn.textContent = '+ Pilih Buku Ini';
+    const isPurchased = purchasedBookIds.has(popupBookId);
+    if (unmarkBtn) unmarkBtn.style.display = isPurchased ? 'block' : 'none';
+    if (isPurchased) {
+      btn.textContent = '✓ Sudah Dibeli';
       btn.classList.remove('in-cart');
+      btn.style.pointerEvents = 'none';
+      btn.style.opacity = '0.5';
+    } else {
+      btn.style.pointerEvents = '';
+      btn.style.opacity = '';
+      if (cart[popupBookId]) {
+        btn.textContent = '✓ Dipilih — Batalkan';
+        btn.classList.add('in-cart');
+      } else {
+        btn.textContent = '+ Pilih Buku Ini';
+        btn.classList.remove('in-cart');
+      }
+    }
+  }
+
+  async function unmarkPurchasedFromPopup() {
+    if (!popupBookId || !currentUser) return;
+    try {
+      const snapshot = await db.collection('orders').doc(currentUser.uid)
+        .collection('purchases').get();
+      const batch = db.batch();
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        if (data.books && data.books.some(b => b.id === popupBookId)) {
+          const newBooks = data.books.filter(b => b.id !== popupBookId);
+          const ref = db.collection('orders').doc(currentUser.uid)
+            .collection('purchases').doc(doc.id);
+          newBooks.length === 0 ? batch.delete(ref) : batch.update(ref, { books: newBooks, totalQty: newBooks.length });
+        }
+      });
+      await batch.commit();
+      await loadPurchasedBooks();
+      updatePopupBtn();
+    } catch(e) {
+      showToast('Gagal mengubah status.');
     }
   }
 
