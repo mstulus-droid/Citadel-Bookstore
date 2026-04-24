@@ -1063,33 +1063,217 @@
     }
     .inquire-send-btn:hover { filter: brightness(1.08); }
 
-    .footer {
-      text-align: center;
-      padding: clamp(20px, 3vw, 28px) clamp(16px, 4vw, 48px);
-      border-top: 1px solid var(--border);
-      background: var(--bg-secondary);
+    /* ========== FOOTER RHADZOR ========== */
+    .rhadzor-footer-wrap {
+      margin-top: 24px;
     }
-
-    .footer-logo img {
-      height: 36px;
-      object-fit: contain;
-      margin: 0 auto 16px;
+    .rhadzor-footer {
+      position: relative;
+      overflow: hidden;
       display: block;
-      opacity: 0.85;
+      text-decoration: none;
+      color: inherit;
+      width: calc(100% + 32px);
+      margin-left: -16px;
+      margin-right: -16px;
+      border-radius: 0;
+      border: 1px solid rgba(148,163,184,0.18);
+      padding: 6px 4px;
+      min-height: 56px;
+      background:
+        radial-gradient(circle at 50% -18%, rgba(147,197,253,0.18), transparent 34%),
+        radial-gradient(circle at 18% 18%, rgba(255,255,255,0.06), transparent 26%),
+        linear-gradient(180deg, #08111f 0%, #0f172a 52%, #111827 100%);
+      box-shadow: 0 20px 42px rgba(2,6,23,0.34);
+      transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+    }
+    .rhadzor-footer:hover {
+      border-color: rgba(147,197,253,0.3);
+      box-shadow: 0 24px 50px rgba(2,6,23,0.42);
+    }
+    .rhadzor-footer-canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .rhadzor-footer-content {
+      position: absolute;
+      inset: 50% auto auto 50%;
+      z-index: 1;
+      transform: translate(-50%, -50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1px;
+      text-align: center;
+      width: 100%;
+      padding: 0 16px;
+    }
+    .rhadzor-footer-kicker {
+      font-size: 10px;
+      letter-spacing: 2.1px;
+      text-transform: uppercase;
+      color: rgba(226,232,240,0.66);
+      line-height: 1;
+      margin: 0;
+    }
+    .rhadzor-footer-title {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 24px;
+      font-weight: 700;
+      color: #f8fafc;
+      letter-spacing: 0.15px;
+      line-height: 1.02;
+      text-shadow: 0 0 18px rgba(147,197,253,0.08);
+      margin: 0;
+    }
+    .rhadzor-footer-title span {
+      color: #7dd3fc;
+    }
+    .rhadzor-footer-glow {
+      position: absolute;
+      inset: auto auto -34px 50%;
+      width: 220px;
+      height: 92px;
+      transform: translateX(-50%);
+      background: radial-gradient(circle, rgba(56,189,248,0.24), transparent 68%);
+      filter: blur(20px);
+      pointer-events: none;
+    }
+    @media(max-width:640px){
+      .rhadzor-footer-wrap { margin-bottom: -28px; }
+      .rhadzor-footer { width: calc(100% + 24px); margin-left: -12px; margin-right: -12px; min-height: 54px; padding: 6px 4px; border-radius: 0; }
+      .rhadzor-footer-title { font-size: 21px; }
+      .rhadzor-footer-kicker { font-size: 9px; letter-spacing: 2.4px; }
+    }
+    @media(max-width:420px){
+      .rhadzor-footer { width: calc(100% + 24px); margin-left: -12px; margin-right: -12px; min-height: 52px; padding: 5px 4px; }
+      .rhadzor-footer-title { font-size: 18px; }
     }
 
-    .footer-text {
+    /* ========== HERO PROFILE ========== */
+    .hero-profile {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      overflow: hidden;
+      border: 2px solid var(--border-strong);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+      background: var(--bg-card);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      margin: 8px auto 10px;
+      transition: border-color 0.2s, transform 0.15s;
+    }
+    .hero-profile:hover { border-color: var(--gold); transform: scale(1.05); }
+    .hero-profile img { width: 100%; height: 100%; object-fit: cover; }
+    .hero-profile-initial {
+      font-family: 'Cinzel', serif;
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--gold);
+    }
+    .hero-orders-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: transparent;
+      border: 1px solid var(--border-strong);
+      color: var(--gold);
+      font-family: 'Cinzel', serif;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      padding: 7px 16px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .hero-orders-btn:hover { background: var(--gold-glow); border-color: var(--gold); }
+
+    /* ========== PROFILE POPUP ========== */
+    .profile-popup-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 700;
+      background: rgba(0,0,0,0.55);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px 16px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s;
+    }
+    .profile-popup-overlay.open { opacity: 1; pointer-events: all; }
+    .profile-popup {
+      background: var(--bg-card);
+      border: 1px solid var(--border-strong);
+      border-radius: 16px;
+      width: 100%;
+      max-width: 300px;
+      padding: 22px 20px;
+      box-shadow: var(--shadow);
+      transform: scale(0.92) translateY(8px);
+      opacity: 0;
+      transition: transform 0.25s cubic-bezier(0.34,1.4,0.64,1), opacity 0.2s;
+      text-align: center;
+    }
+    .profile-popup-overlay.open .profile-popup { transform: scale(1) translateY(0); opacity: 1; }
+    .profile-popup-avatar {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      overflow: hidden;
+      border: 2px solid var(--border-strong);
+      background: var(--bg-card);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 12px;
+    }
+    .profile-popup-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .profile-popup-avatar-initial {
+      font-family: 'Cinzel', serif;
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--gold);
+    }
+    .profile-popup-name {
+      font-family: 'Cinzel', serif;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-main);
+      margin-bottom: 4px;
+    }
+    .profile-popup-email {
       font-size: 12px;
       color: var(--text-sub);
-      line-height: 1.6;
+      margin-bottom: 16px;
+      word-break: break-all;
     }
-
-    .footer-divider {
-      width: 40px;
-      height: 1px;
-      background: var(--border);
-      margin: 14px auto;
+    .profile-popup-logout {
+      width: 100%;
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--silver-dim);
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      font-weight: 500;
+      padding: 10px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: color 0.15s, border-color 0.15s, background 0.15s;
     }
+    .profile-popup-logout:hover { color: #e05050; border-color: #e05050; background: rgba(224,80,80,0.08); }
 
     /* ========== BOOK POPUP ========== */
     .book-popup-overlay {
@@ -1238,17 +1422,20 @@
       .product-grid { grid-template-columns: repeat(5, 1fr); }
     }
 
-    /* ========== AUTH ========== */
-    .auth-float {
+    /* ========== SORT FLOAT (kiri atas) ========== */
+    .sort-float {
       position: fixed;
       top: 120px;
       left: 16px;
       z-index: 200;
+      display: flex;
+      align-items: center;
+      gap: 0;
     }
     @media (max-width: 640px) {
-      .auth-float { top: 72px; left: 14px; }
+      .sort-float { top: 72px; left: 14px; }
     }
-    .auth-float-btn {
+    .sort-trigger {
       background: rgba(12, 12, 15, 0.82);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
@@ -1261,27 +1448,68 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: background 0.2s, border-color 0.2s;
+      transition: background 0.2s, border-color 0.2s, transform 0.2s;
       box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+      flex-shrink: 0;
     }
-    .auth-float-btn:hover { background: rgba(12,12,15,0.95); border-color: var(--gold); }
-    .auth-avatar-float {
-      width: 46px; height: 46px;
-      border-radius: var(--radius-sm);
+    .sort-trigger:hover { background: rgba(12,12,15,0.95); border-color: var(--gold); }
+    .sort-trigger.open { border-color: var(--gold); transform: rotate(90deg); }
+
+    .sort-expand-bar {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-left: 0;
       overflow: hidden;
-      cursor: pointer;
-      border: 1px solid var(--border-strong);
-      box-shadow: 0 4px 16px rgba(0,0,0,0.5);
-      background: var(--bg-card);
-      display: flex; align-items: center; justify-content: center;
-      transition: border-color 0.2s;
+      max-width: 0;
+      opacity: 0;
+      transition: max-width 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.25s ease, margin-left 0.25s ease;
+      pointer-events: none;
     }
-    .auth-avatar-float:hover { border-color: var(--gold); }
-    .auth-avatar-float img { width: 100%; height: 100%; object-fit: cover; }
-    .auth-avatar-initial {
-      font-family: 'Cinzel', serif;
-      font-size: 18px; font-weight: 700;
-      color: var(--gold);
+    .sort-expand-bar.open {
+      max-width: 280px;
+      opacity: 1;
+      margin-left: 10px;
+      pointer-events: all;
+    }
+
+    .sort-pill {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--text-sub);
+      font-family: 'Inter', sans-serif;
+      font-size: 11px;
+      font-weight: 500;
+      padding: 7px 12px;
+      border-radius: 20px;
+      cursor: pointer;
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      transition: border-color 0.15s, color 0.15s, background 0.15s, transform 0.2s cubic-bezier(0.34,1.4,0.64,1), opacity 0.2s ease;
+      opacity: 0;
+      transform: translateX(-12px) scale(0.92);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    }
+    .sort-expand-bar.open .sort-pill {
+      opacity: 1;
+      transform: translateX(0) scale(1);
+    }
+    .sort-expand-bar.open .sort-pill:nth-child(1) { transition-delay: 0.04s; }
+    .sort-expand-bar.open .sort-pill:nth-child(2) { transition-delay: 0.10s; }
+    .sort-expand-bar.open .sort-pill:nth-child(3) { transition-delay: 0.16s; }
+
+    .sort-pill:hover { border-color: var(--gold-dim); color: var(--text-main); background: var(--bg-card-hover); }
+    .sort-pill.active {
+      background: var(--gold-glow);
+      border-color: var(--gold);
+      color: var(--gold-light);
+      font-weight: 600;
+    }
+    .sort-pill .sort-arrow {
+      font-size: 10px;
+      opacity: 0.7;
     }
     .auth-section { margin-top: 16px; }
     .login-hero-btn {
@@ -1541,8 +1769,17 @@
 </head>
 <body>
 
-<!-- AUTH FLOAT -->
-<div class="auth-float" id="authFloat"></div>
+<!-- SORT FLOAT (kiri atas) -->
+<div class="sort-float" id="sortFloat">
+  <button class="sort-trigger" id="sortTrigger" onclick="toggleSortExpand()" title="Urutkan">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5h10"/><path d="M11 12h7"/><path d="M11 19h4"/><path d="M3 5l0 14"/><path d="M3 12l4 4"/><path d="M3 12l4 -4"/></svg>
+  </button>
+  <div class="sort-expand-bar" id="sortExpandBar">
+    <button class="sort-pill" id="sortPillName" onclick="setSortExpand('name')">Nama <span class="sort-arrow" id="arrowName"></span></button>
+    <button class="sort-pill" id="sortPillAuthor" onclick="setSortExpand('author')">Pengarang <span class="sort-arrow" id="arrowAuthor"></span></button>
+    <button class="sort-pill" id="sortPillAdded" onclick="setSortExpand('added')">Ditambahkan <span class="sort-arrow" id="arrowAdded"></span></button>
+  </div>
+</div>
 
 <!-- FLOATING CART -->
 <div class="cart-float">
@@ -1560,9 +1797,6 @@
     <img src="logo/logo citadel.png" alt="Citadel Bookstore" class="hero-logo-img">
     <h1 class="hero-title">Citadel Bookstore</h1>
     <p class="hero-sub">Toko Buku Digital / eBook</p>
-    <p style="font-size:12px;color:var(--text-sub);margin-top:-20px;margin-bottom:28px">
-      <a href="https://rhadzor.id" target="_blank" rel="noopener" style="color:var(--gold-dim);text-decoration:none;transition:color 0.15s" onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='var(--gold-dim)'">Powered by Rhadzor.ID</a>
-    </p>
     <div id="heroAuth" class="auth-section"></div>
   </div>
 </section>
@@ -1678,10 +1912,17 @@
   </div>
 </div>
 
-<!-- FOOTER -->
-<footer class="footer">
-  <p class="footer-text" style="font-size:11px;">© 2026 Citadel Bookstore.</p>
-</footer>
+<!-- FOOTER RHADZOR -->
+<div class="rhadzor-footer-wrap">
+  <a class="rhadzor-footer" href="https://rhadzor.id" target="_blank" rel="noopener noreferrer">
+    <canvas class="rhadzor-footer-canvas" id="rhadzor-footer-canvas" aria-hidden="true"></canvas>
+    <div class="rhadzor-footer-glow"></div>
+    <div class="rhadzor-footer-content">
+      <div class="rhadzor-footer-kicker">Powered By</div>
+      <div class="rhadzor-footer-title">Rhadzor<span>.id</span></div>
+    </div>
+  </a>
+</div>
 
 <!-- CART OVERLAY + SIDEBAR -->
 <div class="cart-overlay" id="cartOverlay" onclick="toggleCart()"></div>
@@ -1736,6 +1977,16 @@
   <button class="mobile-view-cart" onclick="toggleCart()">Lihat Keranjang</button>
 </div>
 
+<!-- PROFILE POPUP -->
+<div class="profile-popup-overlay" id="profilePopupOverlay" onclick="onProfileOverlayClick(event)">
+  <div class="profile-popup" id="profilePopup" onclick="event.stopPropagation()">
+    <div class="profile-popup-avatar" id="profilePopupAvatar"></div>
+    <div class="profile-popup-name" id="profilePopupName"></div>
+    <div class="profile-popup-email" id="profilePopupEmail"></div>
+    <button class="profile-popup-logout" onclick="signOutUser()">Keluar</button>
+  </div>
+</div>
+
 <!-- BOOK POPUP (mobile) -->
 <div class="book-popup-overlay" id="bookPopupOverlay" onclick="closeBookPopup(event)">
   <div class="book-popup" id="bookPopup">
@@ -1777,6 +2028,9 @@
 
   let currentUser = null;
   let pendingBookId = null;
+  let footerStarsState = null;
+  let sortBy = null;
+  let sortDir = 'asc';
 
   auth.onAuthStateChanged(user => {
     currentUser = user;
@@ -1836,30 +2090,45 @@
   }
 
   function updateAuthUI() {
-    const floatEl = document.getElementById('authFloat');
     const heroAuthEl = document.getElementById('heroAuth');
-    if (!floatEl || !heroAuthEl) return;
+    if (!heroAuthEl) return;
     if (currentUser) {
-      const avatarHTML = currentUser.photoURL
+      const heroAvatarHTML = currentUser.photoURL
         ? `<img src="${currentUser.photoURL}" alt="Profil">`
-        : `<span class="auth-avatar-initial">${(currentUser.displayName || 'U')[0].toUpperCase()}</span>`;
-      floatEl.innerHTML = `<button class="auth-avatar-float" onclick="openOrdersModal()" title="Pesanan Saya">${avatarHTML}</button>`;
+        : `<span class="hero-profile-initial">${(currentUser.displayName || 'U')[0].toUpperCase()}</span>`;
       const firstName = currentUser.displayName ? currentUser.displayName.split(' ')[0] : 'Pembaca';
       heroAuthEl.innerHTML = `
         <div class="hero-user-name">Halo, ${firstName}!</div>
-        <div class="hero-user-email">${currentUser.email}</div>
-        <button class="logout-btn" style="display:block;margin:8px auto 0" onclick="signOutUser()">Keluar</button>`;
+        <div class="hero-profile" onclick="openProfilePopup()">${heroAvatarHTML}</div>
+        <button class="hero-orders-btn" onclick="openOrdersModal()">📋 Riwayat Pesanan</button>`;
     } else {
-      floatEl.innerHTML = `
-        <button class="auth-float-btn" onclick="openAuthModal(null)" title="Masuk">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-        </button>`;
       heroAuthEl.innerHTML = `
         <button class="login-hero-btn" onclick="openAuthModal(null)">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
           Masuk dengan Google
         </button>`;
     }
+  }
+
+  function openProfilePopup() {
+    if (!currentUser) return;
+    const avatarHTML = currentUser.photoURL
+      ? `<img src="${currentUser.photoURL}" alt="Profil">`
+      : `<span class="profile-popup-avatar-initial">${(currentUser.displayName || 'U')[0].toUpperCase()}</span>`;
+    document.getElementById('profilePopupAvatar').innerHTML = avatarHTML;
+    document.getElementById('profilePopupName').textContent = currentUser.displayName || 'Pembaca';
+    document.getElementById('profilePopupEmail').textContent = currentUser.email || '';
+    document.getElementById('profilePopupOverlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeProfilePopup() {
+    document.getElementById('profilePopupOverlay').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  function onProfileOverlayClick(e) {
+    if (e.target === document.getElementById('profilePopupOverlay')) closeProfilePopup();
   }
 
   function openAuthModal(bookId) {
@@ -2300,12 +2569,76 @@
 
   function getFilteredBooks() {
     const q = searchQuery.trim().toLowerCase();
-    return BOOKS.filter(b => {
+    let books = BOOKS.filter(b => {
       const matchCat = activeFilters.size === 0 || b.genres.some(g => activeFilters.has(g));
       const matchSearch = !q || b.title.toLowerCase().includes(q) || b.author.toLowerCase().includes(q);
       return matchCat && matchSearch;
-    }).sort((a, b) => (purchasedBookIds.has(a.id) ? 1 : 0) - (purchasedBookIds.has(b.id) ? 1 : 0));
+    });
+
+    if (sortBy) {
+      const dir = sortDir === 'asc' ? 1 : -1;
+      books.sort((a, b) => {
+        if (sortBy === 'name') return a.title.localeCompare(b.title) * dir;
+        if (sortBy === 'author') return a.author.localeCompare(b.author) * dir;
+        if (sortBy === 'added') return (a.id - b.id) * dir;
+        return 0;
+      });
+    } else {
+      books.sort((a, b) => (purchasedBookIds.has(a.id) ? 1 : 0) - (purchasedBookIds.has(b.id) ? 1 : 0));
+    }
+    return books;
   }
+
+  function toggleSortExpand() {
+    const bar = document.getElementById('sortExpandBar');
+    const trigger = document.getElementById('sortTrigger');
+    const isOpen = bar.classList.contains('open');
+    if (isOpen) {
+      bar.classList.remove('open');
+      trigger.classList.remove('open');
+    } else {
+      bar.classList.add('open');
+      trigger.classList.add('open');
+    }
+  }
+
+  function setSortExpand(field) {
+    if (sortBy === field) {
+      sortDir = sortDir === 'asc' ? 'desc' : 'asc';
+    } else {
+      sortBy = field;
+      sortDir = 'asc';
+    }
+    updateSortExpandUI();
+    renderProducts();
+  }
+
+  function updateSortExpandUI() {
+    const fields = ['name', 'author', 'added'];
+    const labels = { name: 'Nama', author: 'Pengarang', added: 'Ditambahkan' };
+    fields.forEach(f => {
+      const pill = document.getElementById('sortPill' + f.charAt(0).toUpperCase() + f.slice(1));
+      const arrow = document.getElementById('arrow' + f.charAt(0).toUpperCase() + f.slice(1));
+      if (!pill || !arrow) return;
+      if (sortBy === f) {
+        pill.classList.add('active');
+        arrow.textContent = sortDir === 'asc' ? '↑' : '↓';
+      } else {
+        pill.classList.remove('active');
+        arrow.textContent = '';
+      }
+    });
+  }
+
+  document.addEventListener('click', (e) => {
+    const sortFloat = document.getElementById('sortFloat');
+    if (sortFloat && !sortFloat.contains(e.target)) {
+      const bar = document.getElementById('sortExpandBar');
+      const trigger = document.getElementById('sortTrigger');
+      if (bar) bar.classList.remove('open');
+      if (trigger) trigger.classList.remove('open');
+    }
+  });
 
   // ==================== RENDER PRODUCTS ====================
   function renderProducts() {
@@ -2767,11 +3100,170 @@ Mohon konfirmasi pesanan saya. Terima kasih! 🙏`;
     popupBookId = null;
   }
 
+  // ==================== FOOTER STARS ====================
+  function initFooterStars(){
+    const canvas = document.getElementById('rhadzor-footer-canvas');
+    const footer = document.querySelector('.rhadzor-footer');
+    if(!canvas || !footer) return;
+
+    const ctx = canvas.getContext('2d');
+    if(!ctx) return;
+
+    if(footerStarsState){
+      if(footerStarsState.resizeHandler){
+        window.removeEventListener('resize', footerStarsState.resizeHandler);
+      }
+      if(footerStarsState.rafId){
+        cancelAnimationFrame(footerStarsState.rafId);
+      }
+    }
+
+    const state = {
+      canvas,
+      ctx,
+      stars: [],
+      width: 0,
+      height: 0,
+      dpr: Math.min(window.devicePixelRatio || 1, 2),
+      rafId: 0,
+      lastTs: 0,
+      resizeHandler: null,
+    };
+
+    const rand = (min, max) => min + Math.random() * (max - min);
+    const pick = arr => arr[Math.floor(Math.random() * arr.length)];
+    const palette = [
+      'rgba(255,255,255,0.95)',
+      'rgba(226,232,240,0.82)',
+      'rgba(186,230,253,0.9)',
+      'rgba(125,211,252,0.88)',
+    ];
+
+    const createStar = (layer, initial = false) => {
+      const baseY = {
+        far: [8, state.height * 0.78],
+        mid: [8, state.height * 0.66],
+        near:[10, state.height * 0.54],
+      }[layer];
+      const radius = {
+        far: rand(0.5, 1.1),
+        mid: rand(0.9, 1.9),
+        near: rand(1.4, 2.8),
+      }[layer];
+      const travel = {
+        far: rand(10, 22),
+        mid: rand(24, 46),
+        near: rand(52, 96),
+      }[layer] * (0.85 + (radius * 0.12));
+      const direction = layer === 'far'
+        ? { vx: -travel, vy: -(travel * rand(0.08, 0.2)) }
+        : layer === 'mid'
+          ? { vx: travel * rand(0.42, 0.62), vy: travel * rand(0.14, 0.26) }
+          : { vx: travel * rand(0.78, 1.02), vy: travel * rand(0.28, 0.46) };
+      const spawn = (() => {
+        if(initial) return { x: rand(0, state.width), y: rand(baseY[0], Math.max(baseY[0] + 10, baseY[1])) };
+        if(layer === 'far'){
+          return {
+            x: state.width + rand(10, 120),
+            y: state.height + rand(4, 36),
+          };
+        }
+        return {
+          x: -rand(14, 90),
+          y: -rand(6, 36),
+        };
+      })();
+      return {
+        layer,
+        x: spawn.x,
+        y: spawn.y,
+        r: radius,
+        vx: direction.vx,
+        vy: direction.vy,
+        alpha: {
+          far: rand(0.26, 0.46),
+          mid: rand(0.46, 0.78),
+          near: rand(0.58, 0.82),
+        }[layer],
+        color: pick(palette),
+        twinkle: rand(0.6, 1.4),
+        twinkleOffset: rand(0, Math.PI * 2),
+      };
+    };
+
+    const buildStars = () => {
+      state.stars = [
+        ...Array.from({ length: 24 }, () => createStar('far', true)),
+        ...Array.from({ length: 11 }, () => createStar('mid', true)),
+        ...Array.from({ length: 3 }, () => createStar('near', true)),
+      ];
+    };
+
+    const resize = () => {
+      const rect = footer.getBoundingClientRect();
+      state.width = Math.max(1, rect.width);
+      state.height = Math.max(1, rect.height);
+      state.dpr = Math.min(window.devicePixelRatio || 1, 2);
+      canvas.width = Math.round(state.width * state.dpr);
+      canvas.height = Math.round(state.height * state.dpr);
+      canvas.style.width = `${state.width}px`;
+      canvas.style.height = `${state.height}px`;
+      ctx.setTransform(state.dpr, 0, 0, state.dpr, 0, 0);
+      buildStars();
+    };
+
+    const drawStar = (star, tsSec) => {
+      const twinkle = 0.84 + (Math.sin((tsSec * star.twinkle) + star.twinkleOffset) * 0.16);
+      const alpha = Math.max(0.08, Math.min(1, star.alpha * twinkle));
+
+      ctx.beginPath();
+      ctx.fillStyle = star.color.replace(/[\d.]+\)$/u, `${alpha})`);
+      ctx.arc(star.x, star.y, star.r, 0, Math.PI * 2);
+      ctx.fill();
+    };
+
+    const animate = (ts) => {
+      if(!state.lastTs) state.lastTs = ts;
+      const delta = Math.min(0.05, (ts - state.lastTs) / 1000);
+      state.lastTs = ts;
+      const tsSec = ts / 1000;
+
+      ctx.clearRect(0, 0, state.width, state.height);
+
+      for(let i = 0; i < state.stars.length; i += 1){
+        const star = state.stars[i];
+        star.x += star.vx * delta;
+        star.y += star.vy * delta;
+
+        const isFar = star.layer === 'far';
+        const outOfBounds = isFar
+          ? (star.x < -(star.r * 10) || star.y < -(star.r * 10))
+          : (star.x > state.width + (star.r * 10) || star.y > state.height + (star.r * 10));
+
+        if(outOfBounds){
+          state.stars[i] = createStar(star.layer, false);
+          continue;
+        }
+
+        drawStar(star, tsSec);
+      }
+
+      state.rafId = requestAnimationFrame(animate);
+    };
+
+    state.resizeHandler = () => resize();
+    resize();
+    window.addEventListener('resize', state.resizeHandler);
+    state.rafId = requestAnimationFrame(animate);
+    footerStarsState = state;
+  }
+
   // ==================== INIT ====================
   loadCartFromStorage();
   renderFilters();
   renderProducts();
   updateUI();
+  initFooterStars();
 
   // ==================== INQUIRE POPUP ====================
   let inquireRows = 0;
