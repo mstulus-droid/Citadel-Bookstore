@@ -1821,6 +1821,318 @@
       transition: background 0.15s, border-color 0.15s, color 0.15s;
     }
     .unmark-btn:hover { background: rgba(224,80,80,0.1); border-color: #e05050; color: #e05050; }
+
+    /* ============================================================ */
+    /* ====================  ANIMATION LAYER  ===================== */
+    /* ============================================================ */
+
+    /* Page-load fade — disappears once layout is ready (no flash) */
+    @keyframes pageFadeIn { from { opacity: 0; } to { opacity: 1; } }
+    body { animation: pageFadeIn 0.5s ease-out both; }
+
+    /* Hero logo: floating with gold breathing glow */
+    @keyframes logoFloat {
+      0%, 100% { transform: translateY(0); filter: drop-shadow(0 6px 20px rgba(201,168,76,0.35)); }
+      50%      { transform: translateY(-4px); filter: drop-shadow(0 10px 28px rgba(201,168,76,0.55)); }
+    }
+    .hero-logo-img {
+      animation: logoFloat 5s ease-in-out infinite;
+    }
+
+    /* Hero entrance: stagger reveal */
+    @keyframes heroRise {
+      from { opacity: 0; transform: translateY(14px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .hero-content > * {
+      animation: heroRise 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+    .hero-content > .hero-logo-img { animation: heroRise 0.8s cubic-bezier(0.22,1,0.36,1) both, logoFloat 5s ease-in-out infinite 0.8s; animation-delay: 0s, 0.8s; }
+    .hero-content > .hero-title    { animation-delay: 0.15s; }
+    .hero-content > .hero-sub      { animation-delay: 0.30s; }
+    .hero-content > .auth-section  { animation-delay: 0.45s; }
+
+    /* Hero title — gold gleam sweep */
+    .hero-title {
+      position: relative;
+      background-size: 200% auto;
+      animation: heroRise 0.8s cubic-bezier(0.22,1,0.36,1) both, titleShimmer 6s ease-in-out infinite 1s;
+    }
+    @keyframes titleShimmer {
+      0%, 100% { background-position: 0% center; }
+      50%      { background-position: 100% center; }
+    }
+
+    /* Tagline letter-spacing breathe */
+    @keyframes taglineBreathe {
+      0%, 100% { letter-spacing: 4px; opacity: 0.85; }
+      50%      { letter-spacing: 5px; opacity: 1; }
+    }
+    .hero-tagline { animation: taglineBreathe 4s ease-in-out infinite; }
+
+    /* Floating gold dust in hero — premium "old library" feel */
+    .hero { isolation: isolate; }
+    .gold-dust {
+      position: absolute;
+      pointer-events: none;
+      inset: 0;
+      overflow: hidden;
+      z-index: 0;
+    }
+    .gold-dust span {
+      position: absolute;
+      bottom: -10px;
+      width: 3px; height: 3px;
+      background: var(--gold-light);
+      border-radius: 50%;
+      opacity: 0;
+      box-shadow: 0 0 6px rgba(232,201,106,0.7);
+      animation: dustRise linear infinite;
+    }
+    @keyframes dustRise {
+      0%   { transform: translate(0, 0) scale(0.6); opacity: 0; }
+      10%  { opacity: 0.8; }
+      80%  { opacity: 0.6; }
+      100% { transform: translate(var(--dx, 12px), -120vh) scale(1); opacity: 0; }
+    }
+
+    /* Pricing tiers stagger reveal on first paint */
+    @keyframes pricingRise {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .pricing-section .tier-pill {
+      animation: pricingRise 0.55s cubic-bezier(0.22,1,0.36,1) both;
+    }
+    .pricing-section .tier-pill:nth-child(1) { animation-delay: 0.50s; }
+    .pricing-section .tier-pill:nth-child(2) { animation-delay: 0.58s; }
+    .pricing-section .tier-pill:nth-child(3) { animation-delay: 0.66s; }
+    .pricing-section .tier-pill:nth-child(4) { animation-delay: 0.74s; }
+    .pricing-section .tier-pill:nth-child(5) { animation-delay: 0.82s; }
+    .pricing-section .tier-pill:nth-child(6) { animation-delay: 0.90s; }
+    .pricing-section .tier-pill:hover {
+      transform: translateY(-3px);
+      border-color: var(--gold-dim);
+      transition: transform 0.25s, border-color 0.25s, background 0.25s;
+    }
+
+    /* Tier active glow */
+    .tier-pill.active::after {
+      content: '';
+      position: absolute;
+      inset: -1px;
+      border-radius: var(--radius-sm);
+      box-shadow: 0 0 0 0 rgba(201,168,76,0.6);
+      animation: tierActivePulse 2.6s ease-out infinite;
+      pointer-events: none;
+    }
+    .tier-pill { position: relative; }
+    @keyframes tierActivePulse {
+      0%   { box-shadow: 0 0 0 0 rgba(201,168,76,0.45); }
+      70%  { box-shadow: 0 0 0 8px rgba(201,168,76,0); }
+      100% { box-shadow: 0 0 0 0 rgba(201,168,76,0); }
+    }
+
+    /* Section divider grows in */
+    @keyframes dividerGrow {
+      from { width: 0; opacity: 0; }
+      to   { width: 60px; opacity: 1; }
+    }
+    .section-divider { animation: dividerGrow 0.8s cubic-bezier(0.22,1,0.36,1) 0.2s both; }
+
+    /* Filter chip subtle hover lift */
+    .filter-chip {
+      transform: translateY(0);
+      transition: border-color 0.15s, background 0.15s, color 0.15s, transform 0.18s ease;
+    }
+    .filter-chip:hover { transform: translateY(-2px); }
+
+    /* ===== Product cards: stagger fade-up on render ===== */
+    @keyframes cardRise {
+      from { opacity: 0; transform: translateY(18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .product-card {
+      opacity: 0;
+      animation: cardRise 0.55s cubic-bezier(0.22,1,0.36,1) both;
+    }
+    .product-card.is-revealed { /* used by IO observer for late items */
+      animation: cardRise 0.55s cubic-bezier(0.22,1,0.36,1) both;
+    }
+
+    /* Cover glow ring on hover */
+    .product-cover-wrap::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      box-shadow: inset 0 0 0 1px rgba(201,168,76,0);
+      transition: box-shadow 0.4s ease;
+      pointer-events: none;
+      z-index: 3;
+    }
+    .product-card:hover .product-cover-wrap::before {
+      box-shadow: inset 0 0 0 1px rgba(201,168,76,0.55), inset 0 0 30px rgba(201,168,76,0.18);
+    }
+
+    /* Cover gleam sweep on hover (gold light passing across the book) */
+    .product-cover-wrap::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -75%;
+      width: 50%;
+      height: 100%;
+      background: linear-gradient(120deg,
+        transparent 0%,
+        rgba(232, 201, 106, 0) 35%,
+        rgba(232, 201, 106, 0.28) 50%,
+        rgba(232, 201, 106, 0) 65%,
+        transparent 100%);
+      transform: skewX(-18deg);
+      pointer-events: none;
+      z-index: 3;
+      transition: left 0.85s cubic-bezier(0.22,1,0.36,1);
+    }
+    .product-card:hover .product-cover-wrap::after { left: 130%; }
+
+    /* Book cover lift (smoother than default) */
+    .product-card {
+      transition: transform 0.35s cubic-bezier(0.22,1,0.36,1),
+                  border-color 0.3s, box-shadow 0.35s;
+    }
+    .product-card:hover { transform: translateY(-6px); }
+    .product-card:hover .product-cover-wrap img { transform: scale(1.06); transition: transform 0.6s cubic-bezier(0.22,1,0.36,1); }
+
+    /* Genre chip subtle hover scale */
+    .genre-chip { transition: transform 0.2s ease, color 0.2s, background 0.2s; }
+    .product-card:hover .genre-chip { color: var(--gold); background: rgba(201,168,76,0.12); }
+
+    /* Title underline appearing on hover */
+    .product-title { position: relative; display: inline-block; }
+    .product-title::after {
+      content: '';
+      position: absolute;
+      left: 50%; bottom: -3px;
+      width: 0; height: 1px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+      transition: width 0.4s ease, left 0.4s ease;
+    }
+    .product-card:hover .product-title::after { width: 100%; left: 0; }
+
+    /* Add-btn subtle gold gleam */
+    .add-btn {
+      position: relative;
+      overflow: hidden;
+    }
+    .add-btn::before {
+      content: '';
+      position: absolute;
+      top: 0; left: -100%;
+      width: 60%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+      transform: skewX(-20deg);
+      transition: left 0.6s ease;
+    }
+    .add-btn:hover::before { left: 130%; }
+
+    /* Cart badge gentle idle pulse when items > 0 */
+    @keyframes badgeIdlePulse {
+      0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(201,168,76,0.5); }
+      50%      { transform: scale(1.06); box-shadow: 0 0 0 4px rgba(201,168,76,0); }
+    }
+    .cart-badge.show { animation: badgeIdlePulse 2.4s ease-in-out infinite; }
+    .cart-badge.pop { animation: badgePop 0.4s cubic-bezier(0.34,1.56,0.64,1) forwards; }
+
+    /* Cart float button — subtle glow when cart has items */
+    .cart-btn.has-items {
+      border-color: var(--gold);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.5), 0 0 18px rgba(201,168,76,0.25);
+    }
+
+    /* Inquire icon bob */
+    @keyframes iconBob {
+      0%, 100% { transform: translateY(0) rotate(-2deg); }
+      50%      { transform: translateY(-4px) rotate(2deg); }
+    }
+    .inquire-icon { display: inline-block; animation: iconBob 3.5s ease-in-out infinite; }
+
+    /* Section header reveal on scroll */
+    .reveal-on-scroll {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.7s cubic-bezier(0.22,1,0.36,1), transform 0.7s cubic-bezier(0.22,1,0.36,1);
+    }
+    .reveal-on-scroll.is-revealed {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Inquire CTA shimmer */
+    .inquire-open-btn {
+      position: relative;
+      overflow: hidden;
+    }
+    .inquire-open-btn::before {
+      content: '';
+      position: absolute;
+      top: 0; left: -100%;
+      width: 50%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(201,168,76,0.25), transparent);
+      transform: skewX(-20deg);
+      animation: ctaSheen 4s ease-in-out infinite 2s;
+    }
+    @keyframes ctaSheen {
+      0%   { left: -100%; }
+      40%  { left: 130%; }
+      100% { left: 130%; }
+    }
+
+    /* Profile button hover spin halo */
+    .hero-profile { position: relative; }
+    .hero-profile::after {
+      content: '';
+      position: absolute;
+      inset: -4px;
+      border-radius: 50%;
+      border: 1px dashed rgba(201,168,76,0);
+      transition: border-color 0.25s, transform 0.6s ease;
+      pointer-events: none;
+    }
+    .hero-profile:hover::after { border-color: rgba(201,168,76,0.7); transform: rotate(120deg); }
+
+    /* Checkout pulse */
+    .checkout-btn:not(:disabled) {
+      animation: checkoutBreathe 3s ease-in-out infinite;
+    }
+    @keyframes checkoutBreathe {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(37,211,102,0); }
+      50%      { box-shadow: 0 0 0 6px rgba(37,211,102,0.06); }
+    }
+
+    /* Tier indicator number "ticker" feel */
+    @keyframes valueFlash {
+      0%   { color: #fff; transform: scale(1.05); }
+      100% { color: var(--gold-light); transform: scale(1); }
+    }
+    .tier-value-flash { animation: valueFlash 0.45s ease-out both; }
+    .summary-total-flash { animation: valueFlash 0.45s ease-out both; }
+
+    /* Toast: float upward more elegantly */
+    @keyframes toastInElegant {
+      from { opacity: 0; transform: translateY(12px) scale(0.95); }
+      to   { opacity: 1; transform: translateY(0)   scale(1); }
+    }
+    .toast { animation: toastInElegant 0.35s cubic-bezier(0.22,1,0.36,1) both, toastOut 0.35s ease 2.2s forwards; }
+
+    /* Reduced motion respect */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.001s !important;
+        animation-delay: 0s !important;
+        transition-duration: 0.05s !important;
+      }
+      .gold-dust { display: none; }
+    }
   </style>
 </head>
 <body>
@@ -1850,6 +2162,7 @@
 
 <!-- HERO -->
 <section class="hero">
+  <div class="gold-dust" id="goldDust" aria-hidden="true"></div>
   <div class="hero-content">
     <img src="logo/logo citadel.png" alt="Citadel Bookstore" class="hero-logo-img">
     <h1 class="hero-title">Citadel Bookstore</h1>
@@ -2049,7 +2362,7 @@
   <div class="book-popup" id="bookPopup">
     <div class="popup-handle"></div>
     <div class="popup-inner">
-      <div class="popup-cover"><img id="popupCover" src="" alt=""></div>
+      <div class="popup-cover"><img id="popupCover" alt=""></div>
       <div class="popup-info">
         <div class="popup-genre" id="popupGenre"></div>
         <div class="popup-title" id="popupTitle"></div>
@@ -2972,11 +3285,12 @@
       return;
     }
 
-    grid.innerHTML = visible.map(book => {
+    grid.innerHTML = visible.map((book, idx) => {
       const genreChips = book.genres.map(g => `<span class="genre-chip">${g}</span>`).join('');
       const safeCover = escAttr(book.cover);
+      const stagger = Math.min(idx, 14) * 40;
       return `
-      <div class="product-card" id="card-${book.id}">
+      <div class="product-card" id="card-${book.id}" style="animation-delay:${stagger}ms">
         <div class="product-cover-wrap" onclick="onCoverClick(${book.id})" style="cursor:pointer">
           <img src="${safeCover}" alt="${escAttr(book.title)}" loading="lazy">
           <span class="product-in-cart" id="inCart-${book.id}">✓ Di Keranjang</span>
@@ -3585,6 +3899,90 @@ Mohon konfirmasi pesanan saya. Terima kasih! 🙏`;
   renderProducts();
   updateUI();
   initFooterStars();
+  initGoldDust();
+  initScrollReveals();
+  initCartGlow();
+  initSummaryFlash();
+
+  // ==================== ANIMATION ENHANCEMENTS ====================
+
+  // Floating gold dust in hero — subtle, slow, premium
+  function initGoldDust() {
+    const host = document.getElementById('goldDust');
+    if (!host) return;
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const COUNT = window.innerWidth < 640 ? 14 : 22;
+    for (let i = 0; i < COUNT; i++) {
+      const s = document.createElement('span');
+      const size = (Math.random() * 2 + 1.2).toFixed(2);
+      const dur = (Math.random() * 14 + 10).toFixed(2);
+      const delay = (Math.random() * 12).toFixed(2);
+      const left = (Math.random() * 100).toFixed(2);
+      const dx = (Math.random() * 60 - 30).toFixed(0);
+      s.style.left = left + '%';
+      s.style.width = size + 'px';
+      s.style.height = size + 'px';
+      s.style.animationDuration = dur + 's';
+      s.style.animationDelay = '-' + delay + 's';
+      s.style.setProperty('--dx', dx + 'px');
+      s.style.opacity = (Math.random() * 0.4 + 0.4).toFixed(2);
+      host.appendChild(s);
+    }
+  }
+
+  // Scroll reveal for section headers / inquire / pricing wrapper
+  function initScrollReveals() {
+    if (!('IntersectionObserver' in window)) return;
+    const targets = [
+      ...document.querySelectorAll('.pricing-title'),
+      ...document.querySelectorAll('.section-header'),
+      ...document.querySelectorAll('.inquire-section > *'),
+    ];
+    targets.forEach(el => el.classList.add('reveal-on-scroll'));
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(en => {
+        if (en.isIntersecting) {
+          en.target.classList.add('is-revealed');
+          io.unobserve(en.target);
+        }
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -60px 0px' });
+    targets.forEach(el => io.observe(el));
+  }
+
+  // Add glow to cart button when it has items
+  function initCartGlow() {
+    const btn = document.querySelector('.cart-btn');
+    const badge = document.getElementById('cartBadge');
+    if (!btn || !badge) return;
+    const apply = () => {
+      const has = badge.classList.contains('show') && parseInt(badge.textContent || '0') > 0;
+      btn.classList.toggle('has-items', has);
+    };
+    apply();
+    const obs = new MutationObserver(apply);
+    obs.observe(badge, { attributes: true, childList: true, characterList: true, subtree: true, attributeFilter: ['class'] });
+  }
+
+  // Flash on tier value / total updates
+  function initSummaryFlash() {
+    ['tierValueText', 'summaryTotal'].forEach(id => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      let prev = el.textContent;
+      const cls = id === 'tierValueText' ? 'tier-value-flash' : 'summary-total-flash';
+      const obs = new MutationObserver(() => {
+        if (el.textContent !== prev) {
+          prev = el.textContent;
+          el.classList.remove(cls);
+          // force reflow
+          void el.offsetWidth;
+          el.classList.add(cls);
+        }
+      });
+      obs.observe(el, { childList: true, characterData: true, subtree: true });
+    });
+  }
 
   // ==================== INQUIRE POPUP ====================
   let inquireRows = 0;
